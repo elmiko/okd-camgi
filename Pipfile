@@ -14,3 +14,4 @@ python_version = "3.9"
 
 [scripts]
 okd-camgi = "python -m okd_camgi.main"
+server = "python -m okd_camgi.main --server"
