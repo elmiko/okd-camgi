@@ -5,10 +5,7 @@ import webbrowser
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-def basename(path):
-    if path.endswith('/'):
-        path = path[:-1]
-    return os.path.basename(path)
+from camgi.contexts import IndexContext
 
 
 def main():
@@ -23,12 +20,8 @@ def main():
     )
     template = env.get_template('index.html')
 
-    vars = {
-        'basename': basename(args.path),
-        'path': args.path,
-    }
-
-    content = template.render(vars)
+    context = IndexContext(args.path)
+    content = template.render(context.data)
     indexpath = os.path.join(mkdtemp(), 'index.html')
     indexfile = open(indexpath, 'w')
     indexfile.write(content)
