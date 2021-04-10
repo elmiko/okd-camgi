@@ -12,4 +12,4 @@ jinja2 = "*"
 python_version = "3.9"
 
 [scripts]
-camgi = "python -m camgi.main"
+okd-camgi = "python -m okd_camgi.main"

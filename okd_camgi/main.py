@@ -5,7 +5,7 @@ import webbrowser
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from camgi.contexts import IndexContext
+from okd_camgi.contexts import IndexContext
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
 
     env = Environment(
-        loader=PackageLoader('camgi', 'templates'),
+        loader=PackageLoader('okd_camgi', 'templates'),
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('index.html')

@@ -1,23 +1,23 @@
 from setuptools import setup
 
-import camgi
+import okd_camgi
 
 
 dependencies = ['jinja2']
 
 
 setup(
-    name='camgi',
+    name='okd-camgi',
     version=camgi.version,
     license='GPLv3',
     author='michael mccune',
     author_email='msm@opbstudios.com',
-    packages=['camgi'],
+    packages=['okd_camgi'],
     install_requires=dependencies,
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'camgi = camgi.main:main',
+            'okd-camgi = okd_camgi.main:main',
         ],
     }
 )
