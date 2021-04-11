@@ -20,11 +20,6 @@ def load_index_from_path(path):
 
     mustgather = MustGather(path)
 
-    # render the mustgather_data.js template
-    # mustgather_data_template = env.get_template('mustgather_data.js')
-    # mustgather_data_context = MustGatherDataContext(mustgather)
-    # mustgather_data_content = mustgather_data_template.render(mustgather_data_context.data)
-
     # render the index.html template
     index_template = env.get_template('index.html')
     index_context = IndexContext(mustgather)
@@ -38,16 +33,19 @@ def main():
     parser.add_argument('path', help='path to the root of must-gather tree')
     parser.add_argument('--webbrowser', action='store_true', help='open a webbrowser to investigation')
     parser.add_argument('--server', action='store_true', help='run in server mode')
+    parser.add_argument('--host', help='server host address', default='127.0.0.1')
+    parser.add_argument('--port', help='server host port', default='8080')
     args = parser.parse_args()
 
     content = load_index_from_path(args.path)
-    indexpath = os.path.join(mkdtemp(), 'index.html')
-    indexfile = open(indexpath, 'w')
-    indexfile.write(content)
-    indexfile.close()
+    if not args.server:
+        indexpath = os.path.join(mkdtemp(), 'index.html')
+        indexfile = open(indexpath, 'w')
+        indexfile.write(content)
+        indexfile.close()
 
-    host = '127.0.0.1'
-    port = 8080
+    host = args.host
+    port = int(args.port)
     url = f'file://{indexpath}' if not args.server else f'http://{host}:{port}/'
     print(f'{url}')
 
