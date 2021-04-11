@@ -3,7 +3,12 @@ from setuptools import setup
 import okd_camgi
 
 
-dependencies = ['jinja2', 'bottle', 'pyyaml']
+dependencies = [
+    'jinja2',
+    'bottle',
+    'pyyaml',
+    'pygments',
+]
 
 
 setup(

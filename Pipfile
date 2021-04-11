@@ -9,6 +9,7 @@ verify_ssl = true
 jinja2 = "*"
 bottle = "*"
 pyyaml = "*"
+pygments = "*"
 
 [requires]
 python_version = "3.9"

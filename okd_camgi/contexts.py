@@ -2,6 +2,19 @@
 from collections import UserDict
 import os.path
 
+from pygments import highlight
+from pygments.lexers import YamlLexer
+from pygments.formatters import HtmlFormatter
+
+
+class DataListEntry(UserDict):
+    def __init__(self, id, content):
+        initial = {
+            'id': id,
+            'content': content,
+        }
+        super().__init__(initial)
+
 
 class IndexContext(UserDict):
     '''Context for the index.html template'''
@@ -9,8 +22,9 @@ class IndexContext(UserDict):
         initial = {
             'basename': self.basename(mustgather.path),
             'datalist': [
-                { 'id': 'cluster-autoscaler-deployment', 'content': f'{self.cluster_autoscaler_deployment(mustgather)}' },
+                DataListEntry(id='cluster-autoscaler-deployment', content=f'{self.cluster_autoscaler_deployment(mustgather)}'),
             ],
+            'highlight_css': HtmlFormatter().get_style_defs('.highlight')
         }
         super().__init__(initial)
 
@@ -19,10 +33,10 @@ class IndexContext(UserDict):
         if path.endswith('/'):
             path = path[:-1]
         return os.path.basename(path)
-        
+
     @staticmethod
     def cluster_autoscaler_deployment(mustgather):
         deployment = mustgather.clusterautoscaler.deployment
         if deployment is None:
             return 'Deployment not found, check <must-gather path>/namespaces/openshift-machine-api/apps/deployments.yaml'
-        return deployment.as_yaml()
+        return highlight(deployment.as_yaml(), YamlLexer(), HtmlFormatter())
