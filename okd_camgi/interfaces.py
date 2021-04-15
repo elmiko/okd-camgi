@@ -42,7 +42,7 @@ class MustGather:
         man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
         if not os.path.exists(man_path):
             return None
-        deployments = yaml.load(open(man_path).read())
+        deployments = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
         requested = None
         for d in deployments.get('items', []):
             if d.get('metadata', {}).get('name') == name:
@@ -54,7 +54,7 @@ class MustGather:
         man_path = os.path.join(self.path, 'namespaces', ns, 'pods', name, f'{name}.yaml')
         if not os.path.exists(man_path):
             return None
-        pod = yaml.load(open(man_path).read())
+        pod = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
         return pod
 
     def podnames(self, ns, name_prefix):

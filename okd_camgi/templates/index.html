@@ -49,10 +49,14 @@
 data {
   display: none;
 }
+#nav-col {
+  max-width: 280px;
+}
 </style>
   </head>
   <body>
     <div class="container-fluid">
+      <!--
       <div class="row-fluid border-bottom">
         <div class="col">
           <div id="top-tray" class="mb-1">
@@ -60,8 +64,9 @@ data {
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-3">
+      -->
+      <div class="row mt-2">
+        <div class="col-3" id="nav-col">
           <ul id="list-links" class="list-unstyled ps-0">
             <li class="mb-1">
               <button
@@ -93,19 +98,24 @@ data {
   <!-- bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
   <!-- vuejs -->
+  <!--
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  -->
 
 <script>
+  /*
 var app = new Vue({
   el: '#top-tray',
   data: {
     message: '{{ basename }}'
   }
 })
+ */
 
-var toptray = document.getElementById('top-tray')
+//var toptray = document.getElementById('top-tray')
 var maincontent = document.getElementById('main-content')
-maincontent.style.height = window.innerHeight - toptray.scrollHeight - 10
+//maincontent.style.height = window.innerHeight - toptray.scrollHeight - 10
+maincontent.style.height = window.innerHeight - 10
 var datalist = [ {% for data in datalist %} "{{ data.id }}", {% endfor %} ]
 datalist.forEach(function (element) {
     let anchor = document.getElementById(element)
@@ -116,7 +126,6 @@ datalist.forEach(function (element) {
         }
     }
 })
-
 </script>
   </body>
 </html>

@@ -8,9 +8,10 @@ from pygments.formatters import HtmlFormatter
 
 
 class DataListEntry(UserDict):
-    def __init__(self, id, content):
+    def __init__(self, id, anchor_name, content):
         initial = {
             'id': id,
+            'anchor-name': anchor_name,
             'content': content,
         }
         super().__init__(initial)
@@ -22,7 +23,7 @@ class IndexContext(UserDict):
         initial = {
             'basename': self.basename(mustgather.path),
             'datalist': [
-                DataListEntry(id='cluster-autoscaler-deployment', content=f'{self.cluster_autoscaler_deployment(mustgather)}'),
+                DataListEntry(id='cluster-autoscaler-deployment', anchor_name='Deployment', content=f'{self.cluster_autoscaler_deployment(mustgather)}'),
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight')
         }
