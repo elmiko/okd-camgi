@@ -7,11 +7,11 @@ from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
 
 
-class DataListEntry(UserDict):
-    def __init__(self, id, anchor_name, content):
+class NavListEntry(UserDict):
+    def __init__(self, cssid, anchor_name, content):
         initial = {
-            'id': id,
-            'anchor-name': anchor_name,
+            'id': cssid,
+            'anchor_name': anchor_name,
             'content': content,
         }
         super().__init__(initial)
@@ -20,10 +20,16 @@ class DataListEntry(UserDict):
 class IndexContext(UserDict):
     '''Context for the index.html template'''
     def __init__(self, mustgather):
+        ca_deployment = NavListEntry(cssid='cluster-autoscaler-deployment',
+                                     anchor_name='Deployment',
+                                     content=f'{self.cluster_autoscaler_deployment(mustgather)}')
         initial = {
             'basename': self.basename(mustgather.path),
+            'ca': {
+                'deployment': ca_deployment,
+            },
             'datalist': [
-                DataListEntry(id='cluster-autoscaler-deployment', anchor_name='Deployment', content=f'{self.cluster_autoscaler_deployment(mustgather)}'),
+                ca_deployment,
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight')
         }

@@ -77,7 +77,7 @@ data {
               </button>
               <div class="collapse show" id="ca-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                  <li><a href="#" id="cluster-autoscaler-deployment" class="link-dark rounded">Deployment</a></li>
+                  <li><a href="#" id="{{ ca.deployment.id }}" class="link-dark rounded">{{ ca.deployment.anchor_name }}</a></li>
                 </ul>
               </div>
             </li>
@@ -88,6 +88,8 @@ data {
         </div>
       </div>
     </div>
+
+<!-- data -->
 
 {% for data in datalist %}
 <data id="{{ data.id }}-data">
