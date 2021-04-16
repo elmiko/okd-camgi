@@ -36,10 +36,15 @@ class Deployment(UserDict, Yamlable, KubeMeta):
     pass
 
 
+class Machine(UserDict, Yamlable, KubeMeta):
+    pass
+
+
 class MustGather:
     def __init__(self, path):
         self.path = path
         self._clusterautoscaler = None
+        self._machines = None
 
     def deployment_or_none(self, ns, name):
         man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
@@ -73,6 +78,18 @@ class MustGather:
         if self._clusterautoscaler is None:
             self._clusterautoscaler = ClusterAutoscaler(self)
         return self._clusterautoscaler
+
+    @property
+    def machines(self):
+        if self._machines is None:
+            machines = []
+            path = os.path.join(self.path, 'namespaces', 'openshift-machine-api', 'machine.openshift.io', 'machines')
+            for f in os.listdir(path):
+                if f.endswith('.yaml'):
+                    machine = yaml.load(open(os.path.join(path, f)).read(), Loader=yaml.FullLoader)
+                    machines.append(Machine(machine))
+                self._machines = sorted(machines, key=lambda m: m.name())
+        return self._machines
 
 
 class Pod(UserDict, Yamlable, KubeMeta):

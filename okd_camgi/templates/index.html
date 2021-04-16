@@ -14,6 +14,9 @@ data {
 #nav-col {
   max-width: 280px;
 }
+table {
+  font-size: 8pt;
+}
 </style>
   </head>
   <body>
@@ -29,25 +32,31 @@ data {
       -->
       <div class="row mt-2">
         <div class="col-3" id="nav-col">
+          <div class="list-group">
+            <a href="#" id="summary" class="list-group-item list-group-item-action list-group-item-primary">Summary</a>
+            <a href="#" id="machines" class="list-group-item list-group-item-action list-group-item-primary">Machines</a>
+          </div>
+
+          <!--
           <ul id="list-links" class="ps-0">
             <li class="mb-1 fw-bold">Cluster Autoscaler
               <ul class="fw-normal ps-2 pb-1 small">
                 <li>Deployment
                   <ul class="fw-normal ps-2 pb-1 small">
-                    <li><a href="#" id="{{ ca.deployment.id }}" class="link-dark rounded">{{ ca.deployment.anchor_name }}</a></li>
+                    <li class="bg-success bg-gradient"><a href="#" id="{{ ca.deployment.id }}" class="link-light rounded">{{ ca.deployment.anchor_name }}</a></li>
                   </ul>
                 </li>
                 <li class="">Pods
-                  <!-- todo highlight the pods entry if none exist -->
                   <ul class="fw-normal ps-2 pb-1 small">
                     {% for pod in ca.pods %}
-                    <li><a href="#" id="{{ pod.id }}" class="link-dark rounded">{{ pod.anchor_name }}</a></li>
+                    <li class="bg-success bg-gradient"><a href="#" id="{{ pod.id }}" class="link-light rounded">{{ pod.anchor_name }}</a></li>
                     {% endfor %}
                   </ul>
                 </li>
               </ul>
             </li>
           </ul>
+          -->
         </div>
         <div class="col-9">
           <div id="main-content" class="overflow-auto"></div>
@@ -58,6 +67,55 @@ data {
 <!-- data -->
 
 {% for data in datalist %}
+<data id="summary-data">
+  <h1>Summary</h1>
+  <h2>Machines</h2>
+  <table class="table table-sm table-hover font-monospace">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Phase</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for machine in machines %}
+      <tr>
+        <th scope="col">{{ machine.metadata.name }}</th>
+        <td>{{ machine.status.phase }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</data>
+
+<data id="machines-data">
+  <h1>Machines</h1>
+  <div class="accordion" id="machines-accordion">
+    {% for machine in machines %}
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="heading-{{ machine.metadata.name }}">
+        <button
+            class="accordion-button collapsed p-2"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-{{ machine.metadata.name }}" 
+            aria-expanded="false"
+            aria-controls="collapse-{{ machine.metadata.name }}">
+          {{ machine.metadata.name }}
+        </button>
+        <div id="collapse-{{ machine.metadata.name }}"
+             class="accordion-collapse collapse"
+             aria-labelledby="heading-{{ machine.metadata.name }}"
+             data-bs-parents="#machine-accordion">
+          <div class="accordion-body fs-6">
+            {{ machine.yaml_highlight_content }}
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</data>
+
 <data id="{{ data.id }}-data">
 {{ data.content }}
 </data>
@@ -85,6 +143,8 @@ var maincontent = document.getElementById('main-content')
 //maincontent.style.height = window.innerHeight - toptray.scrollHeight - 10
 maincontent.style.height = window.innerHeight - 10
 var datalist = [ {% for data in datalist %} "{{ data.id }}", {% endfor %} ]
+datalist.push('machines')
+datalist.push('summary')
 datalist.forEach(function (element) {
     let anchor = document.getElementById(element)
     if (anchor != undefined) {
@@ -94,6 +154,8 @@ datalist.forEach(function (element) {
         }
     }
 })
+var summary = document.getElementById('summary')
+summary.click()
 </script>
   </body>
 </html>

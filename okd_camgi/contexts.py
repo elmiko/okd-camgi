@@ -7,6 +7,13 @@ from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
 
 
+class MachineEntry(UserDict):
+    def __init__(self, initial):
+        content = highlight(initial.as_yaml(), YamlLexer(), HtmlFormatter())
+        initial['yaml_highlight_content'] = content
+        super().__init__(initial)
+
+
 class NavListEntry(UserDict):
     def __init__(self, cssid, anchor_name, content):
         initial = {
@@ -32,7 +39,8 @@ class IndexContext(UserDict):
                 ca_deployment,
                 *ca_pods,
             ],
-            'highlight_css': HtmlFormatter().get_style_defs('.highlight')
+            'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
+            'machines': [MachineEntry(machine) for machine in mustgather.machines],
         }
         super().__init__(initial)
 
