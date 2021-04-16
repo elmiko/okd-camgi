@@ -29,8 +29,7 @@ class ClusterAutoscaler:
         
 
 class Deployment(UserDict, Yamlable):
-    def as_json(self):
-        return json.dumps(self.data)
+    pass
 
 
 class MustGather:
