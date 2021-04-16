@@ -10,6 +10,10 @@ import yaml
 mapi_namespace = 'openshift-machine-api'
 
 
+class KubeMeta:
+    def name(self):
+        return self.data.get('metadata', {}).get('name')
+
 class Yamlable:
     def as_yaml(self):
         data = deepcopy(self.data)
@@ -28,7 +32,7 @@ class ClusterAutoscaler:
                 self.pods.append(pod)
         
 
-class Deployment(UserDict, Yamlable):
+class Deployment(UserDict, Yamlable, KubeMeta):
     pass
 
 
@@ -71,5 +75,5 @@ class MustGather:
         return self._clusterautoscaler
 
 
-class Pod(UserDict, Yamlable):
+class Pod(UserDict, Yamlable, KubeMeta):
     pass

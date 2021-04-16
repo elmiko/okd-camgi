@@ -32,7 +32,11 @@ data {
           <ul id="list-links" class="ps-0">
             <li class="mb-1 fw-bold">Cluster Autoscaler
               <ul class="fw-normal ps-2 pb-1 small">
-                <li><a href="#" id="{{ ca.deployment.id }}" class="link-dark rounded">{{ ca.deployment.anchor_name }}</a></li>
+                <li>Deployment
+                  <ul class="fw-normal ps-2 pb-1 small">
+                    <li><a href="#" id="{{ ca.deployment.id }}" class="link-dark rounded">{{ ca.deployment.anchor_name }}</a></li>
+                  </ul>
+                </li>
                 <li class="">Pods
                   <!-- todo highlight the pods entry if none exist -->
                   <ul class="fw-normal ps-2 pb-1 small">

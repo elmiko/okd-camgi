@@ -48,13 +48,14 @@ class IndexContext(UserDict):
         if deployment is None:
             return 'Deployment not found, check <must-gather path>/namespaces/openshift-machine-api/apps/deployments.yaml'
         content = highlight(deployment.as_yaml(), YamlLexer(), HtmlFormatter())
-        return NavListEntry(cssid='cluster-autoscaler-deployment', anchor_name='Deployment', content=content)
+        anchor = deployment.name()
+        return NavListEntry(cssid='cluster-autoscaler-deployment', anchor_name=anchor, content=content)
 
     @staticmethod
     def cluster_autoscaler_pods(mustgather):
         ret = []
         for pod in  mustgather.clusterautoscaler.pods:
-            name = pod.get('metadata', {}).get('name', 'UNKNOWN')
+            name = pod.name()
             content = highlight(pod.as_yaml(), YamlLexer(), HtmlFormatter())
             ret.append(NavListEntry(cssid=name, anchor_name=name, content=content))
         return ret
