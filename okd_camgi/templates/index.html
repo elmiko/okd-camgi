@@ -78,6 +78,22 @@ data {
               <div class="collapse show" id="ca-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                   <li><a href="#" id="{{ ca.deployment.id }}" class="link-dark rounded">{{ ca.deployment.anchor_name }}</a></li>
+                  <li><button
+                          class="btn btn-toggle align-items-center rounded collapsed"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#ca-pods-collapse"
+                          aria-expanded="true">Pods
+                      </button>
+                      <!-- todo highlight the pods entry if none exist -->
+                        <div class="collapse show" id="ca-pods-collapse">
+                          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            {% for pod in ca.pods %}
+                            <li><a href="#" id="{{ pod.id }}" class="link-dark rounded">{{ pod.anchor_name }}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                  </li>
+
                 </ul>
               </div>
             </li>

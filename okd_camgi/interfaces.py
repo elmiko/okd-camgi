@@ -54,7 +54,7 @@ class MustGather:
         if not os.path.exists(man_path):
             return None
         pod = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
-        return pod
+        return Pod(pod)
 
     def podnames(self, ns, name_prefix):
         '''get a list of pods with a given name prefix'''
