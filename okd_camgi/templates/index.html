@@ -199,61 +199,35 @@ table {
   </dl>
 </data>
 
-<data id="machines-data">
-  <h1>Machines</h1>
-  <div class="accordion" id="machines-accordion">
-    {% for machine in machines %}
+{% for data in accordiondata %}
+<data id="{{ data.cssid }}-data">
+  <h1>{{ data.name }}</h1>
+  <div class="accordion" id="{{ data.cssid }}-accordion">
+    {% for item in data.iterable %}
     <div class="accordion-item">
-      <h2 class="accordion-header" id="heading-{{ machine.metadata.name|replace(".", "-") }}">
-        <button
-            class="accordion-button collapsed p-2"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapse-{{ machine.metadata.name|replace(".", "-") }}" 
-            aria-expanded="false"
-            aria-controls="collapse-{{ machine.metadata.name|replace(".", "-") }}">
-          {{ machine.metadata.name }}
-        </button>
-        <div id="collapse-{{ machine.metadata.name|replace(".", "-") }}"
+      <h2 class="accordion-header" id="heading-{{ item.metadata.name|replace(".", "-") }}">
+      <button
+          class="accordion-button collapsed p-2"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapse-{{ item.metadata.name|replace(".", "-") }}" 
+          aria-expanded="false"
+          aria-controls="collapse-{{ item.metadata.name|replace(".", "-") }}">
+        {{ item.metadata.name }}
+      </button>
+        <div id="collapse-{{ item.metadata.name|replace(".", "-") }}"
              class="accordion-collapse collapse"
-             aria-labelledby="heading-{{ machine.metadata.name|replace(".", "-") }}"
-             data-bs-parents="#machine-accordion">
+             aria-labelledby="heading-{{ item.metadata.name|replace(".", "-") }}"
+             data-bs-parents="#{{ data.cssid }}-accordion">
           <div class="accordion-body fs-6">
-            {{ machine.yaml_highlight_content }}
+            {{ item.yaml_highlight_content }}
           </div>
         </div>
     </div>
     {% endfor %}
   </div>
 </data>
-
-<data id="nodes-data">
-  <h1>Nodes</h1>
-  <div class="accordion" id="nodes-accordion">
-    {% for node in nodes %}
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="heading-{{ node.metadata.name|replace(".", "-") }}">
-        <button
-            class="accordion-button collapsed p-2"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapse-{{ node.metadata.name|replace(".", "-") }}" 
-            aria-expanded="false"
-            aria-controls="collapse-{{ node.metadata.name|replace(".", "-") }}">
-          {{ node.metadata.name }}
-        </button>
-        <div id="collapse-{{ node.metadata.name|replace(".", "-") }}"
-             class="accordion-collapse collapse"
-             aria-labelledby="heading-{{ node.metadata.name|replace(".", "-") }}"
-             data-bs-parents="#node-accordion">
-          <div class="accordion-body fs-6">
-            {{ node.yaml_highlight_content }}
-          </div>
-        </div>
-    </div>
-    {% endfor %}
-  </div>
-</data>
+{% endfor %}
 
 {% for data in datalist %}
 <data id="{{ data.id }}-data">

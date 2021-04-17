@@ -7,6 +7,16 @@ from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
 
 
+class AccordionDataContext(UserDict):
+    def __init__(self, name, iterable):
+        initial = {
+            'cssid': name.lower(),
+            'name': name,
+            'iterable': iterable,
+        }
+        super().__init__(initial)
+
+
 class HighlightedYamlContext(UserDict):
     def __init__(self, initial):
         content = highlight(initial.as_yaml(), YamlLexer(), HtmlFormatter())
@@ -63,7 +73,13 @@ class IndexContext(UserDict):
     def __init__(self, mustgather):
         # ca_deployment = self.cluster_autoscaler_deployment(mustgather)
         # ca_pods = self.cluster_autoscaler_pods(mustgather)
+        machines = MachinesContext([ResourceContext(machine) for machine in mustgather.machines])
+        nodes = NodesContext([ResourceContext(node) for node in mustgather.nodes])
         initial = {
+            'accordiondata': [
+                AccordionDataContext('Machines', machines),
+                AccordionDataContext('Nodes', nodes),
+            ],
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers],
             'datalist': [
@@ -72,10 +88,10 @@ class IndexContext(UserDict):
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
-            'machines': MachinesContext([ResourceContext(machine) for machine in mustgather.machines]),
+            'machines': machines,
             'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
             'machinesets_participating': [ msc for msc in [MachineSetContext(machineset) for machineset in mustgather.machinesets] if msc.autoscaler_min],
-            'nodes': NodesContext([ResourceContext(node) for node in mustgather.nodes]),
+            'nodes': nodes,
         }
         super().__init__(initial)
 
