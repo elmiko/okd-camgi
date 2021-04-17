@@ -23,8 +23,9 @@ class Yamlable:
         return yaml.dump(data)
 
     
-class ClusterAutoscaler:
-    def __init__(self, mustgather):
+class ClusterAutoscaler(UserDict, Yamlable, KubeMeta):
+    def old__init__(self, mustgather):
+        self.resource = mustgather.cluster_scoped_resource_or_none('autoscaling.openshift.io', 'clusterautoscalers', 'default')
         self.deployment = mustgather.deployment_or_none(mapi_namespace, 'cluster-autoscaler-default')
         self.pods = []
         for p in mustgather.podnames(mapi_namespace, 'cluster-autoscaler-default-'):
@@ -52,39 +53,11 @@ class MustGather:
         self._machines = None
         self._nodes = None
 
-    def deployment_or_none(self, ns, name):
-        man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
-        if not os.path.exists(man_path):
-            return None
-        logging.debug(f'loading deployment yaml from {man_path}')
-        deployments = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
-        requested = None
-        for d in deployments.get('items', []):
-            if d.get('metadata', {}).get('name') == name:
-                requested = Deployment(d)
-                break
-        return requested
-
-    def pod_or_none(self, ns, name):
-        man_path = os.path.join(self.path, 'namespaces', ns, 'pods', name, f'{name}.yaml')
-        if not os.path.exists(man_path):
-            return None
-        logging.debug(f'lodding pod yaml from {man_path}')
-        pod = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
-        return Pod(pod)
-
-    def podnames(self, ns, name_prefix):
-        '''get a list of pods with a given name prefix'''
-        podnames = []
-        for f in os.listdir(os.path.join(self.path, 'namespaces', ns, 'pods')):
-            if f.startswith(name_prefix):
-                podnames.append(f)
-        return podnames
-
     @property
     def clusterautoscaler(self):
         if self._clusterautoscaler is None:
-            self._clusterautoscaler = ClusterAutoscaler(self)
+            ca = self.cluster_scoped_resource_or_none('autoscaling.openshift.io', 'clusterautoscalers', 'default')
+            self._clusterautoscaler = ClusterAutoscaler(ca)
         return self._clusterautoscaler
 
     @property
@@ -115,5 +88,48 @@ class MustGather:
                 self._nodes = sorted(nodes, key=lambda n: n.name())
         return self._nodes
 
+    def deployment_or_none(self, ns, name):
+        man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
+        if not os.path.exists(man_path):
+            return None
+        logging.debug(f'loading deployment yaml from {man_path}')
+        deployments = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
+        requested = None
+        for d in deployments.get('items', []):
+            if d.get('metadata', {}).get('name') == name:
+                requested = Deployment(d)
+                break
+        return requested
+
+    def pod_or_none(self, ns, name):
+        man_path = os.path.join(self.path, 'namespaces', ns, 'pods', name, f'{name}.yaml')
+        if not os.path.exists(man_path):
+            return None
+        logging.debug(f'lodding pod yaml from {man_path}')
+        pod = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
+        return Pod(pod)
+
+    def podnames(self, ns, name_prefix):
+        '''get a list of pods with a given name prefix'''
+        podnames = []
+        for f in os.listdir(os.path.join(self.path, 'namespaces', ns, 'pods')):
+            if f.startswith(name_prefix):
+                podnames.append(f)
+        return podnames
+
+    def cluster_scoped_resource_or_none(self, group, kind, name):
+        '''get a resource or none if not found'''
+        man_path = os.path.join(self.path, 'cluster-scoped-resources', group, kind, f'{name}.yaml')
+        if not os.path.exists(man_path):
+            return None
+        logging.debug(f'loading {group}/{kind} yaml from {man_path}')
+        resource = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
+        return Resource(resource)
+
+
 class Pod(UserDict, Yamlable, KubeMeta):
+    pass
+
+
+class Resource(UserDict, Yamlable, KubeMeta):
     pass

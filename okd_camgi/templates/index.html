@@ -49,6 +49,13 @@ table {
 <data id="summary-data">
   <h1>Summary</h1>
   <dl>
+    {% if ca.metadata.name %}
+      <dt>ClusterAutoscaler {{ ca.metadata.name }}</dt>
+      <dd>{{ ca.yaml_highlight_content }}</dd>
+    {% else %}
+      <dt>ClusterAutoscaler not found</dt>
+      <dd>The default ClusterAutoscaler was not found.</dd>
+      {% endif %}
     <dt>{{ machines|length }} Machines</dt>
     <dd>
     {% if machines.notrunning|length == 0 %}
