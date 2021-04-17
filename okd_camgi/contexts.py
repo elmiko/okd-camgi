@@ -25,14 +25,14 @@ class NodesContext(UserList):
         return notready
 
 
-class ResourceEntry(UserDict):
+class ResourceContext(UserDict):
     def __init__(self, initial):
         content = highlight(initial.as_yaml(), YamlLexer(), HtmlFormatter())
         initial['yaml_highlight_content'] = content
         super().__init__(initial)
 
 
-class NavListEntry(UserDict):
+class NavListContext(UserDict):
     def __init__(self, cssid, anchor_name, content):
         initial = {
             'id': cssid,
@@ -58,8 +58,8 @@ class IndexContext(UserDict):
                 *ca_pods,
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
-            'machines': MachinesContext([ResourceEntry(machine) for machine in mustgather.machines]),
-            'nodes': NodesContext([ResourceEntry(node) for node in mustgather.nodes]),
+            'machines': MachinesContext([ResourceContext(machine) for machine in mustgather.machines]),
+            'nodes': NodesContext([ResourceContext(node) for node in mustgather.nodes]),
         }
         super().__init__(initial)
 
@@ -76,7 +76,7 @@ class IndexContext(UserDict):
             return 'Deployment not found, check <must-gather path>/namespaces/openshift-machine-api/apps/deployments.yaml'
         content = highlight(deployment.as_yaml(), YamlLexer(), HtmlFormatter())
         anchor = deployment.name()
-        return NavListEntry(cssid='cluster-autoscaler-deployment', anchor_name=anchor, content=content)
+        return NavListContext(cssid='cluster-autoscaler-deployment', anchor_name=anchor, content=content)
 
     @staticmethod
     def cluster_autoscaler_pods(mustgather):
@@ -84,6 +84,6 @@ class IndexContext(UserDict):
         for pod in  mustgather.clusterautoscaler.pods:
             name = pod.name()
             content = highlight(pod.as_yaml(), YamlLexer(), HtmlFormatter())
-            ret.append(NavListEntry(cssid=name, anchor_name=name, content=content))
+            ret.append(NavListContext(cssid=name, anchor_name=name, content=content))
         return ret
 
