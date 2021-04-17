@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import logging
 import os.path
 from tempfile import mkdtemp
 from threading import Thread
@@ -29,6 +30,7 @@ def load_index_from_path(path):
 
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
     parser = ArgumentParser(description='investigate a must-gather for clues of autoscaler activity')
     parser.add_argument('path', help='path to the root of must-gather tree')
     parser.add_argument('--webbrowser', action='store_true', help='open a webbrowser to investigation')

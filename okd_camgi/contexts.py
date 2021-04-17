@@ -1,10 +1,28 @@
 '''Context classes are the adaptors between data interfaces and templates.'''
-from collections import UserDict
+from collections import UserDict, UserList
 import os.path
 
 from pygments import highlight
 from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
+
+
+class MachinesContext(UserList):
+    @property
+    def notrunning(self):
+        ret = list(filter(lambda m: m.get('status', {}).get('phase') != 'Running', self.data))
+        return ret
+
+
+class NodesContext(UserList):
+    @property
+    def notready(self):
+        notready = []
+        for node in self.data:
+            for condition in node.get('status', {}).get('conditions', []):
+                if condition.get('type') == 'Ready' and condition.get('status') == 'False':
+                    notready.append(node)
+        return notready
 
 
 class ResourceEntry(UserDict):
@@ -40,8 +58,8 @@ class IndexContext(UserDict):
                 *ca_pods,
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
-            'machines': [ResourceEntry(machine) for machine in mustgather.machines],
-            'nodes': [ResourceEntry(node) for node in mustgather.nodes],
+            'machines': MachinesContext([ResourceEntry(machine) for machine in mustgather.machines]),
+            'nodes': NodesContext([ResourceEntry(node) for node in mustgather.nodes]),
         }
         super().__init__(initial)
 

@@ -69,39 +69,58 @@ table {
 {% for data in datalist %}
 <data id="summary-data">
   <h1>Summary</h1>
-  <h2>Machines ({{ machines|length }})</h2>
-  <table class="table table-sm table-hover font-monospace">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Phase</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for machine in machines %}
-      <tr>
-        <th scope="col">{{ machine.metadata.name }}</th>
-        <td>{{ machine.status.phase }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <dl>
+    <dt>{{ machines|length }} Machines</dt>
+    <dd>
+    {% if machines.notrunning|length == 0 %}
+    All machines in Running phase
+    {% else %}
+    The following are not in Running phase
+    <table class="table table-sm table-hover font-monospace">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Phase</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for machine in machines.notrunning %}
+        <tr>
+          <th scope="col">{{ machine.metadata.name }}</th>
+          {% if machine.status %}
+          <td>{{ machine.status.phase }}</td>
+          {% else %}
+          <td>Status not found!</td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
 
-  <h2>Nodes ({{ nodes|length }})</h2>
-  <table class="table table-sm table-hover font-monospace">
-    <thead>
-      <tr>
-        <th scope="col">Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for node in nodes %}
-      <tr>
-        <th scope="col">{{ node.metadata.name }}</th>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <dt>{{ nodes.data|length }} Nodes</dt>
+    <dd>
+    {% if nodes.notready|length == 0 %}
+    All nodes ready
+    {% else %}
+    The following are not Ready
+    <table class="table table-sm table-hover font-monospace">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for node in nodes.notready %}
+        <tr>
+          <th scope="col">{{ node.metadata.name }}</th>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    </dd>
+  </dl>
 </data>
 
 <data id="machines-data">

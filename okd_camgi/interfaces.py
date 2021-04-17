@@ -2,6 +2,7 @@
 from collections import UserDict
 from copy import deepcopy
 import json
+import logging
 import os.path
 
 import yaml
@@ -55,6 +56,7 @@ class MustGather:
         man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
         if not os.path.exists(man_path):
             return None
+        logging.debug(f'loading deployment yaml from {man_path}')
         deployments = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
         requested = None
         for d in deployments.get('items', []):
@@ -67,6 +69,7 @@ class MustGather:
         man_path = os.path.join(self.path, 'namespaces', ns, 'pods', name, f'{name}.yaml')
         if not os.path.exists(man_path):
             return None
+        logging.debug(f'lodding pod yaml from {man_path}')
         pod = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
         return Pod(pod)
 
@@ -91,7 +94,9 @@ class MustGather:
             path = os.path.join(self.path, 'namespaces', 'openshift-machine-api', 'machine.openshift.io', 'machines')
             for f in os.listdir(path):
                 if f.endswith('.yaml'):
-                    machine = yaml.load(open(os.path.join(path, f)).read(), Loader=yaml.FullLoader)
+                    man_path = os.path.join(path, f)
+                    logging.debug(f'loading machine yaml from {man_path}')
+                    machine = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
                     machines.append(Machine(machine))
                 self._machines = sorted(machines, key=lambda m: m.name())
         return self._machines
@@ -103,7 +108,9 @@ class MustGather:
             path = os.path.join(self.path, 'cluster-scoped-resources', 'core', 'nodes')
             for f in os.listdir(path):
                 if f.endswith('.yaml'):
-                    node = yaml.load(open(os.path.join(path, f)).read(), Loader=yaml.FullLoader)
+                    man_path = os.path.join(path, f)
+                    logging.debug(f'loading node yaml from {man_path}')
+                    node = yaml.load(open(man_path).read(), Loader=yaml.FullLoader)
                     nodes.append(Node(node))
                 self._nodes = sorted(nodes, key=lambda n: n.name())
         return self._nodes
