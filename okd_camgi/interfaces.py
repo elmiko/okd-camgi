@@ -40,11 +40,16 @@ class Machine(UserDict, Yamlable, KubeMeta):
     pass
 
 
+class Node(UserDict, Yamlable, KubeMeta):
+    pass
+
+
 class MustGather:
     def __init__(self, path):
         self.path = path
         self._clusterautoscaler = None
         self._machines = None
+        self._nodes = None
 
     def deployment_or_none(self, ns, name):
         man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
@@ -91,6 +96,17 @@ class MustGather:
                 self._machines = sorted(machines, key=lambda m: m.name())
         return self._machines
 
+    @property
+    def nodes(self):
+        if self._nodes is None:
+            nodes = []
+            path = os.path.join(self.path, 'cluster-scoped-resources', 'core', 'nodes')
+            for f in os.listdir(path):
+                if f.endswith('.yaml'):
+                    node = yaml.load(open(os.path.join(path, f)).read(), Loader=yaml.FullLoader)
+                    nodes.append(Node(node))
+                self._nodes = sorted(nodes, key=lambda n: n.name())
+        return self._nodes
 
 class Pod(UserDict, Yamlable, KubeMeta):
     pass

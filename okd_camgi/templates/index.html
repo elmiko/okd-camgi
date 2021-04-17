@@ -34,7 +34,7 @@ table {
         <div class="col-3" id="nav-col">
           <div class="list-group">
             <a href="#" id="summary" class="list-group-item list-group-item-action list-group-item-primary">Summary</a>
-            <a href="#" id="machines" class="list-group-item list-group-item-action list-group-item-primary">Machines</a>
+            <a href="#" id="machines" class="list-group-item list-group-item-action">Machines</a>
           </div>
 
           <!--
@@ -69,7 +69,7 @@ table {
 {% for data in datalist %}
 <data id="summary-data">
   <h1>Summary</h1>
-  <h2>Machines</h2>
+  <h2>Machines ({{ machines|length }})</h2>
   <table class="table table-sm table-hover font-monospace">
     <thead>
       <tr>
@@ -82,6 +82,22 @@ table {
       <tr>
         <th scope="col">{{ machine.metadata.name }}</th>
         <td>{{ machine.status.phase }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Nodes ({{ nodes|length }})</h2>
+  <table class="table table-sm table-hover font-monospace">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for node in nodes %}
+      <tr>
+        <th scope="col">{{ node.metadata.name }}</th>
       </tr>
       {% endfor %}
     </tbody>
