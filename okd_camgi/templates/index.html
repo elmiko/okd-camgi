@@ -88,6 +88,30 @@ table {
       {% endfor %}
     </dd>
 
+    <dt>{{ machineautoscalers|length }} MachineAutoscalers</dt>
+    <dd>
+      <table class="table table-sm table-hover font-monospace">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">MachineSet</th>
+            <th scope="col">Min</th>
+            <th scope="col">Max</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for machineautoscaler in machineautoscalers %}
+          <tr>
+            <th scope="col">{{ machineautoscaler.metadata.name }}</th>
+            <td>{{ machineautoscaler.spec.scaleTargetRef.name }}</td>
+            <td>{{ machineautoscaler.spec.minReplicas }}</td>
+            <td>{{ machineautoscaler.spec.maxReplicas }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </dd>
+
     <dt>{{ machines|length }} Machines</dt>
     <dd>
     {% if machines.notrunning|length == 0 %}

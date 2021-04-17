@@ -54,6 +54,7 @@ class IndexContext(UserDict):
         initial = {
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers],
+            'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
             'datalist': [
                 # ca_deployment,
                 # *ca_pods,

@@ -23,15 +23,21 @@ class MustGather:
     def __init__(self, path):
         self.path = path
         self._clusterautoscalers = None
+        self._machineautoscalers = None
         self._machines = None
         self._nodes = None
 
     @property
     def clusterautoscalers(self):
         if self._clusterautoscalers is None:
-            clusterautoscalers = self.resources('clusterautoscalers', 'autoscaling.openshift.io')
-            self._clusterautoscalers = clusterautoscalers
+            self._clusterautoscalers = self.resources('clusterautoscalers', 'autoscaling.openshift.io')
         return self._clusterautoscalers
+
+    @property
+    def machineautoscalers(self):
+        if self._machineautoscalers is None:
+            self._machineautoscalers = self.resources('machineautoscalers', 'autoscaling.openshift.io', 'openshift-machine-api')
+        return self._machineautoscalers
 
     @property
     def machines(self):
