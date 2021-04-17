@@ -50,11 +50,12 @@ table {
 
 <data id="summary-data">
   <h1>Summary</h1>
+  <hr/>
   <dl>
-    <dt>{{ clusterautoscalers|length }} ClusterAutoscalers</dt>
+    <dt class="text-light bg-secondary ps-1 mb-1">{{ clusterautoscalers|length }} x ClusterAutoscalers</dt>
     <dd>
       {% for clusterautoscaler in clusterautoscalers %}
-      {{ clusterautoscaler.metadata.name }}
+      <span class="font-monospace">{{ clusterautoscaler.metadata.name }}</span>
       <table class="table table-sm table-striped font-monospace">
         <thead>
           <tr>
@@ -90,7 +91,7 @@ table {
       {% endfor %}
     </dd>
 
-    <dt>{{ machineautoscalers|length }} MachineAutoscalers</dt>
+    <dt class="text-light bg-secondary ps-1 mb-1">{{ machineautoscalers|length }} x MachineAutoscalers</dt>
     <dd>
       <table class="table table-sm table-striped font-monospace">
         <thead>
@@ -114,7 +115,7 @@ table {
       </table>
     </dd>
 
-    <dt>{{ machinesets|length }} MachineSets</dt>
+    <dt class="text-light bg-secondary ps-1 mb-1">{{ machinesets|length }} x MachineSets</dt>
     <dd>
       {% if machinesets_participating|length == 0 %}
       No MachineSets participating in Autoscaling
@@ -141,7 +142,7 @@ table {
       {% endif %}
     </dd>
 
-    <dt>{{ machines|length }} Machines</dt>
+    <dt class="text-light bg-secondary ps-1 mb-1">{{ machines|length }} x Machines</dt>
     <dd>
     {% if machines.notrunning|length == 0 %}
     All machines in Running phase
@@ -176,7 +177,7 @@ table {
     </table>
     {% endif %}
 
-    <dt>{{ nodes.data|length }} Nodes</dt>
+    <dt class="text-light bg-secondary ps-1 mb-1">{{ nodes.data|length }} x Nodes</dt>
     <dd>
     {% if nodes.notready|length == 0 %}
     All nodes ready
