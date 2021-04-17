@@ -22,16 +22,16 @@ class Resource(UserDict):
 class MustGather:
     def __init__(self, path):
         self.path = path
-        self._clusterautoscaler = None
+        self._clusterautoscalers = None
         self._machines = None
         self._nodes = None
 
     @property
-    def clusterautoscaler(self):
-        if self._clusterautoscaler is None:
-            ca = self.resource_or_none('default', 'clusterautoscalers', 'autoscaling.openshift.io')
-            self._clusterautoscaler = ca
-        return self._clusterautoscaler
+    def clusterautoscalers(self):
+        if self._clusterautoscalers is None:
+            clusterautoscalers = self.resources('clusterautoscalers', 'autoscaling.openshift.io')
+            self._clusterautoscalers = clusterautoscalers
+        return self._clusterautoscalers
 
     @property
     def machines(self):

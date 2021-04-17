@@ -14,10 +14,6 @@ class HighlightedYamlContext(UserDict):
         super().__init__(initial)
 
 
-class ClusterAutoscalerContext(HighlightedYamlContext):
-    pass
-
-
 class MachinesContext(UserList):
     @property
     def notrunning(self):
@@ -55,10 +51,9 @@ class IndexContext(UserDict):
     def __init__(self, mustgather):
         # ca_deployment = self.cluster_autoscaler_deployment(mustgather)
         # ca_pods = self.cluster_autoscaler_pods(mustgather)
-        ca = ClusterAutoscalerContext(mustgather.clusterautoscaler)
         initial = {
             'basename': self.basename(mustgather.path),
-            'ca': ca,
+            'clusterautoscalers': [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers],
             'datalist': [
                 # ca_deployment,
                 # *ca_pods,

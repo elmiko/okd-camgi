@@ -49,13 +49,45 @@ table {
 <data id="summary-data">
   <h1>Summary</h1>
   <dl>
-    {% if ca.metadata.name %}
-      <dt>ClusterAutoscaler {{ ca.metadata.name }}</dt>
-      <dd>{{ ca.yaml_highlight_content }}</dd>
-    {% else %}
-      <dt>ClusterAutoscaler not found</dt>
-      <dd>The default ClusterAutoscaler was not found.</dd>
-      {% endif %}
+    <dt>{{ clusterautoscalers|length }} ClusterAutoscalers</dt>
+    <dd>
+      {% for clusterautoscaler in clusterautoscalers %}
+      {{ clusterautoscaler.metadata.name }}
+      <table class="table table-sm table-hover font-monospace">
+        <thead>
+          <tr>
+            <th scope="col">Resource</th>
+            <th scope="col">Min</th>
+            <th scope="col">Max</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% if clusterautoscaler.spec.resourceLimits.cores %}
+          <tr>
+            <th scope="col">Cores</th>
+            <td>{{ clusterautoscaler.spec.resourceLimits.cores.min }}</td>
+            <td>{{ clusterautoscaler.spec.resourceLimits.cores.max }}</td>
+          </tr>
+          {% endif %}
+          {% if clusterautoscaler.spec.resourceLimits.memory %}
+          <tr>
+            <th scope="col">Memory</th>
+            <td>{{ clusterautoscaler.spec.resourceLimits.memory.min }}</td>
+            <td>{{ clusterautoscaler.spec.resourceLimits.memory.max }}</td>
+          </tr>
+          {% endif %}
+          {% for gpu in clusterautoscaler.spec.resourceLimits.gpus %}
+          <tr>
+            <th scope="col">{{ gpu.type }}</td>
+            <td>{{ gpu.min }}</td>
+            <td>{{ gpu.max }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endfor %}
+    </dd>
+
     <dt>{{ machines|length }} Machines</dt>
     <dd>
     {% if machines.notrunning|length == 0 %}
