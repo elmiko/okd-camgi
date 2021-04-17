@@ -53,7 +53,7 @@ table {
     <dd>
       {% for clusterautoscaler in clusterautoscalers %}
       {{ clusterautoscaler.metadata.name }}
-      <table class="table table-sm table-hover font-monospace">
+      <table class="table table-sm table-striped font-monospace">
         <thead>
           <tr>
             <th scope="col">Resource</th>
@@ -90,7 +90,7 @@ table {
 
     <dt>{{ machineautoscalers|length }} MachineAutoscalers</dt>
     <dd>
-      <table class="table table-sm table-hover font-monospace">
+      <table class="table table-sm table-striped font-monospace">
         <thead>
           <tr>
             <th scope="col">Name</th>
@@ -118,7 +118,7 @@ table {
     All machines in Running phase
     {% else %}
     The following {{ machines.notrunning|length }} are not in Running phase
-    <table class="table table-sm table-hover font-monospace">
+    <table class="table table-sm table-striped font-monospace">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -146,7 +146,7 @@ table {
     All nodes ready
     {% else %}
     The following {{ nodes.notready|length }} are not Ready
-    <table class="table table-sm table-hover font-monospace">
+    <table class="table table-sm table-striped font-monospace">
       <thead>
         <tr>
           <th scope="col">Name</th>
