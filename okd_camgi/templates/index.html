@@ -114,19 +114,19 @@ table {
   <div class="accordion" id="machines-accordion">
     {% for machine in machines %}
     <div class="accordion-item">
-      <h2 class="accordion-header" id="heading-{{ machine.metadata.name }}">
+      <h2 class="accordion-header" id="heading-{{ machine.metadata.name|replace(".", "-") }}">
         <button
             class="accordion-button collapsed p-2"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#collapse-{{ machine.metadata.name }}" 
+            data-bs-target="#collapse-{{ machine.metadata.name|replace(".", "-") }}" 
             aria-expanded="false"
-            aria-controls="collapse-{{ machine.metadata.name }}">
+            aria-controls="collapse-{{ machine.metadata.name|replace(".", "-") }}">
           {{ machine.metadata.name }}
         </button>
-        <div id="collapse-{{ machine.metadata.name }}"
+        <div id="collapse-{{ machine.metadata.name|replace(".", "-") }}"
              class="accordion-collapse collapse"
-             aria-labelledby="heading-{{ machine.metadata.name }}"
+             aria-labelledby="heading-{{ machine.metadata.name|replace(".", "-") }}"
              data-bs-parents="#machine-accordion">
           <div class="accordion-body fs-6">
             {{ machine.yaml_highlight_content }}
@@ -142,19 +142,19 @@ table {
   <div class="accordion" id="nodes-accordion">
     {% for node in nodes %}
     <div class="accordion-item">
-      <h2 class="accordion-header" id="heading-{{ node.metadata.name }}">
+      <h2 class="accordion-header" id="heading-{{ node.metadata.name|replace(".", "-") }}">
         <button
             class="accordion-button collapsed p-2"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#collapse-{{ node.metadata.name }}" 
+            data-bs-target="#collapse-{{ node.metadata.name|replace(".", "-") }}" 
             aria-expanded="false"
-            aria-controls="collapse-{{ node.metadata.name }}">
+            aria-controls="collapse-{{ node.metadata.name|replace(".", "-") }}">
           {{ node.metadata.name }}
         </button>
-        <div id="collapse-{{ node.metadata.name }}"
+        <div id="collapse-{{ node.metadata.name|replace(".", "-") }}"
              class="accordion-collapse collapse"
-             aria-labelledby="heading-{{ node.metadata.name }}"
+             aria-labelledby="heading-{{ node.metadata.name|replace(".", "-") }}"
              data-bs-parents="#node-accordion">
           <div class="accordion-body fs-6">
             {{ node.yaml_highlight_content }}
