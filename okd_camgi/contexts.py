@@ -21,6 +21,18 @@ class MachinesContext(UserList):
         return ret
 
 
+class MachineSetContext(HighlightedYamlContext):
+    @property
+    def autoscaler_min(self):
+        '''return autoscaler min or "n/a"'''
+        return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-min-size', 'n/a')
+
+    @property
+    def autoscaler_max(self):
+        '''return autoscaler max or "n/a"'''
+        return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-max-size', 'n/a')
+
+
 class NodesContext(UserList):
     @property
     def notready(self):
@@ -54,13 +66,14 @@ class IndexContext(UserDict):
         initial = {
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers],
-            'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
             'datalist': [
                 # ca_deployment,
                 # *ca_pods,
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
+            'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
             'machines': MachinesContext([ResourceContext(machine) for machine in mustgather.machines]),
+            'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
             'nodes': NodesContext([ResourceContext(node) for node in mustgather.nodes]),
         }
         super().__init__(initial)

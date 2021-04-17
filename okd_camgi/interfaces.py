@@ -25,6 +25,7 @@ class MustGather:
         self._clusterautoscalers = None
         self._machineautoscalers = None
         self._machines = None
+        self._machinesets = None
         self._nodes = None
 
     @property
@@ -45,6 +46,13 @@ class MustGather:
             machines = self.resources('machines', 'machine.openshift.io', 'openshift-machine-api')
             self._machines = sorted(machines, key=lambda m: m.name())
         return self._machines
+
+    @property
+    def machinesets(self):
+        if self._machinesets is None:
+            machinesets = self.resources('machinesets', 'machine.openshift.io', 'openshift-machine-api')
+            self._machinesets = sorted(machinesets, key=lambda m: m.name())
+        return self._machinesets
 
     @property
     def nodes(self):

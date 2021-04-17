@@ -112,6 +112,28 @@ table {
       </table>
     </dd>
 
+    <dt>{{ machinesets|length }} MachineSets</dt>
+    <dd>
+      <table class="table table-sm table-striped font-monospace">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Min Replicas</th>
+            <th scope="col">Max Replicas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for machineset in machinesets %}
+          <tr>
+            <th scope="col">{{ machineset.metadata.name }}</th>
+            <td>{{ machineset.autoscaler_min }}</td>
+            <td>{{ machineset.autoscaler_max }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </dd>
+
     <dt>{{ machines|length }} Machines</dt>
     <dd>
     {% if machines.notrunning|length == 0 %}
