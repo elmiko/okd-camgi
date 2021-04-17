@@ -150,6 +150,7 @@ table {
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Phase</th>
+          <th scope="col">Node</th>
         </tr>
       </thead>
       <tbody>
@@ -158,8 +159,14 @@ table {
           <th scope="col">{{ machine.metadata.name }}</th>
           {% if machine.status %}
           <td>{{ machine.status.phase }}</td>
+            {% if machine.status.nodeRef %}
+            <td>{{ machine.status.nodeRef.name }}</td>
+            {% else %}
+            <td>No Node found!</td>
+            {% endif %}
           {% else %}
           <td>Status not found!</td>
+          <td>No Node found!</td>
           {% endif %}
         </tr>
         {% endfor %}
