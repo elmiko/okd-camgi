@@ -34,6 +34,8 @@ table {
         <div class="col-2" id="nav-col">
           <div class="list-group">
             <a href="#" id="summary" class="list-group-item list-group-item-action">Summary</a>
+            <a href="#" id="clusterautoscalers" class="list-group-item list-group-item-action">ClusterAutoscalers</a>
+            <a href="#" id="machineautoscalers" class="list-group-item list-group-item-action">MachineAutoscalers</a>
             <a href="#" id="machines" class="list-group-item list-group-item-action">Machines</a>
             <a href="#" id="nodes" class="list-group-item list-group-item-action">Nodes</a>
           </div>
@@ -250,6 +252,8 @@ var app = new Vue({
 var maincontent = document.getElementById('main-content')
 maincontent.style.height = window.innerHeight - 10
 var datalist = [
+  'clusterautoscalers',
+  'machineautoscalers',
   'machines',
   'nodes',
   'summary',

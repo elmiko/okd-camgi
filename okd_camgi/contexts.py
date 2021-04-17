@@ -71,19 +71,21 @@ class NavListContext(UserDict):
 class IndexContext(UserDict):
     '''Context for the index.html template'''
     def __init__(self, mustgather):
-        # ca_deployment = self.cluster_autoscaler_deployment(mustgather)
-        # ca_pods = self.cluster_autoscaler_pods(mustgather)
+        machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
+        clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([ResourceContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([ResourceContext(node) for node in mustgather.nodes])
         initial = {
             'accordiondata': [
+                AccordionDataContext('ClusterAutoscalers', clusterautoscalers),
+                AccordionDataContext('MachineAutoscalers', machineautoscalers),
                 AccordionDataContext('Machines', machines),
                 AccordionDataContext('Nodes', nodes),
             ],
             'basename': self.basename(mustgather.path),
-            'clusterautoscalers': [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers],
+            'clusterautoscalers': clusterautoscalers,
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
-            'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
+            'machineautoscalers': machineautoscalers,
             'machines': machines,
             'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
             'machinesets_participating': [ msc for msc in [MachineSetContext(machineset) for machineset in mustgather.machinesets] if msc.autoscaler_min],
