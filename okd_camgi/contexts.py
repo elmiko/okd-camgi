@@ -7,6 +7,17 @@ from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
 
 
+class HighlightedYamlContext(UserDict):
+    def __init__(self, initial):
+        content = highlight(initial.as_yaml(), YamlLexer(), HtmlFormatter())
+        initial['yaml_highlight_content'] = content
+        super().__init__(initial)
+
+
+class ClusterAutoscalerContext(HighlightedYamlContext):
+    pass
+
+
 class MachinesContext(UserList):
     @property
     def notrunning(self):
@@ -25,11 +36,8 @@ class NodesContext(UserList):
         return notready
 
 
-class ResourceContext(UserDict):
-    def __init__(self, initial):
-        content = highlight(initial.as_yaml(), YamlLexer(), HtmlFormatter())
-        initial['yaml_highlight_content'] = content
-        super().__init__(initial)
+class ResourceContext(HighlightedYamlContext):
+    pass
 
 
 class NavListContext(UserDict):
@@ -45,17 +53,17 @@ class NavListContext(UserDict):
 class IndexContext(UserDict):
     '''Context for the index.html template'''
     def __init__(self, mustgather):
-        ca_deployment = self.cluster_autoscaler_deployment(mustgather)
-        ca_pods = self.cluster_autoscaler_pods(mustgather)
+        # ca_deployment = self.cluster_autoscaler_deployment(mustgather)
+        # ca_pods = self.cluster_autoscaler_pods(mustgather)
         initial = {
             'basename': self.basename(mustgather.path),
             'ca': {
-                'deployment': ca_deployment,
-                'pods': ca_pods,
+                # 'deployment': ca_deployment,
+                # 'pods': ca_pods,
             },
             'datalist': [
-                ca_deployment,
-                *ca_pods,
+                # ca_deployment,
+                # *ca_pods,
             ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machines': MachinesContext([ResourceContext(machine) for machine in mustgather.machines]),
