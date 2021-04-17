@@ -82,10 +82,6 @@ class IndexContext(UserDict):
             ],
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers],
-            'datalist': [
-                # ca_deployment,
-                # *ca_pods,
-            ],
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
             'machines': machines,
