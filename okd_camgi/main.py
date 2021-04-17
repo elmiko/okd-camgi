@@ -37,14 +37,14 @@ def main():
     parser.add_argument('--server', action='store_true', help='run in server mode')
     parser.add_argument('--host', help='server host address', default='127.0.0.1')
     parser.add_argument('--port', help='server host port', default='8080')
+    parser.add_argument('--output', help='output filename')
     args = parser.parse_args()
 
     content = load_index_from_path(args.path)
-    if not args.server:
-        indexpath = os.path.join(mkdtemp(), 'index.html')
-        indexfile = open(indexpath, 'w')
-        indexfile.write(content)
-        indexfile.close()
+    if args.output or not args.server:
+        indexpath = args.output if args.output else os.path.join(mkdtemp(), 'index.html')
+        with open(indexpath, 'w') as indexfile:
+            indexfile.write(content)
 
     host = args.host
     port = int(args.port)
