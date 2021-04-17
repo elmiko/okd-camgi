@@ -114,6 +114,10 @@ table {
 
     <dt>{{ machinesets|length }} MachineSets</dt>
     <dd>
+      {% if machinesets_participating|length == 0 %}
+      No MachineSets participating in Autoscaling
+      {% else %}
+      The following {{ machinesets_participating|length }} are participating in Autoscaling
       <table class="table table-sm table-striped font-monospace">
         <thead>
           <tr>
@@ -123,7 +127,7 @@ table {
           </tr>
         </thead>
         <tbody>
-          {% for machineset in machinesets %}
+          {% for machineset in machinesets_participating %}
           <tr>
             <th scope="col">{{ machineset.metadata.name }}</th>
             <td>{{ machineset.autoscaler_min }}</td>
@@ -132,6 +136,7 @@ table {
           {% endfor %}
         </tbody>
       </table>
+      {% endif %}
     </dd>
 
     <dt>{{ machines|length }} Machines</dt>

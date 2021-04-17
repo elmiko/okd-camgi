@@ -24,13 +24,13 @@ class MachinesContext(UserList):
 class MachineSetContext(HighlightedYamlContext):
     @property
     def autoscaler_min(self):
-        '''return autoscaler min or "n/a"'''
-        return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-min-size', 'n/a')
+        '''return autoscaler min or none'''
+        return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-min-size')
 
     @property
     def autoscaler_max(self):
-        '''return autoscaler max or "n/a"'''
-        return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-max-size', 'n/a')
+        '''return autoscaler max or none'''
+        return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-max-size')
 
 
 class NodesContext(UserList):
@@ -74,6 +74,7 @@ class IndexContext(UserDict):
             'machineautoscalers': [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers],
             'machines': MachinesContext([ResourceContext(machine) for machine in mustgather.machines]),
             'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
+            'machinesets_participating': [ msc for msc in [MachineSetContext(machineset) for machineset in mustgather.machinesets] if msc.autoscaler_min],
             'nodes': NodesContext([ResourceContext(node) for node in mustgather.nodes]),
         }
         super().__init__(initial)
