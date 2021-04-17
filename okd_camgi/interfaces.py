@@ -8,14 +8,10 @@ import os.path
 import yaml
 
 
-mapi_namespace = 'openshift-machine-api'
-
-
-class KubeMeta:
+class Resource(UserDict):
     def name(self):
         return self.data.get('metadata', {}).get('name')
 
-class Yamlable:
     def as_yaml(self):
         data = deepcopy(self.data)
         if data.get('metadata', {}).get('managedFields'):
@@ -23,22 +19,6 @@ class Yamlable:
         return yaml.dump(data)
 
     
-class ClusterAutoscaler(UserDict, Yamlable, KubeMeta):
-    pass
-        
-
-class Deployment(UserDict, Yamlable, KubeMeta):
-    pass
-
-
-class Machine(UserDict, Yamlable, KubeMeta):
-    pass
-
-
-class Node(UserDict, Yamlable, KubeMeta):
-    pass
-
-
 class MustGather:
     def __init__(self, path):
         self.path = path
@@ -49,78 +29,44 @@ class MustGather:
     @property
     def clusterautoscaler(self):
         if self._clusterautoscaler is None:
-            ca = self.resource_or_none('autoscaling.openshift.io', 'clusterautoscalers', 'default')
-            self._clusterautoscaler = ClusterAutoscaler(ca)
+            ca = self.resource_or_none('default', 'clusterautoscalers', 'autoscaling.openshift.io')
+            self._clusterautoscaler = ca
         return self._clusterautoscaler
 
     @property
     def machines(self):
         if self._machines is None:
-            machines = []
-            path = os.path.join(self.path, 'namespaces', 'openshift-machine-api', 'machine.openshift.io', 'machines')
-            for f in os.listdir(path):
-                if f.endswith('.yaml'):
-                    man_path = os.path.join(path, f)
-                    logging.debug(f'loading machine yaml from {man_path}')
-                    with open(man_path) as man_file:
-                        machine = yaml.load(man_file.read(), Loader=yaml.FullLoader)
-                        machines.append(Machine(machine))
-                self._machines = sorted(machines, key=lambda m: m.name())
+            machines = self.resources('machines', 'machine.openshift.io', 'openshift-machine-api')
+            self._machines = sorted(machines, key=lambda m: m.name())
         return self._machines
 
     @property
     def nodes(self):
         if self._nodes is None:
-            nodes = []
-            path = os.path.join(self.path, 'cluster-scoped-resources', 'core', 'nodes')
-            for f in os.listdir(path):
-                if f.endswith('.yaml'):
-                    man_path = os.path.join(path, f)
-                    logging.debug(f'loading node yaml from {man_path}')
-                    with open(man_path) as man_file:
-                        node = yaml.load(man_file.read(), Loader=yaml.FullLoader)
-                        nodes.append(Node(node))
-                self._nodes = sorted(nodes, key=lambda n: n.name())
+            nodes = self.resources('nodes', 'core')
+            self._nodes = sorted(nodes, key=lambda n: n.name())
         return self._nodes
 
-    def deployment_or_none(self, ns, name):
-        man_path = os.path.join(self.path, 'namespaces', ns, 'apps', 'deployments.yaml')
-        if not os.path.exists(man_path):
-            return None
-        logging.debug(f'loading deployment yaml from {man_path}')
-        with open(man_path) as man_file:
-            deployments = yaml.load(man_file.read(), Loader=yaml.FullLoader)
-        requested = None
-        for d in deployments.get('items', []):
-            if d.get('metadata', {}).get('name') == name:
-                requested = Deployment(d)
-                break
-        return requested
-
-    def pod_or_none(self, ns, name):
-        man_path = os.path.join(self.path, 'namespaces', ns, 'pods', name, f'{name}.yaml')
-        if not os.path.exists(man_path):
-            return None
-        logging.debug(f'lodding pod yaml from {man_path}')
-        with open(man_path) as man_file:
-            pod = yaml.load(man_file.read(), Loader=yaml.FullLoader)
-            return Pod(pod)
-
-    def podnames(self, ns, name_prefix):
-        '''get a list of pods with a given name prefix'''
-        podnames = []
-        for f in os.listdir(os.path.join(self.path, 'namespaces', ns, 'pods')):
-            if f.startswith(name_prefix):
-                podnames.append(f)
-        return podnames
-
-    def resource_or_none(self, group, kind, name, ns=None):
-    # def cluster_scoped_resource_or_none(self, group, kind, name):
-        '''get a resource or none if not found'''
-        if ns is None:
-            man_path = os.path.join(self.path, 'cluster-scoped-resources', group, kind, f'{name}.yaml')
+    @staticmethod
+    def build_manifest_path(path, name, kind, group, namespace):
+        pathlist = [path]
+        if namespace is None:
+            pathlist.append('cluster-scoped-resources')
         else:
-            man_path = os.path.join(self.path, 'namespaces', ns, group, kind, f'{name}.yaml')
+            pathlist.append('namespaces')
+            pathlist.append(namespace)
+        if group is not None:
+            pathlist.append(group)
+        pathlist.append(kind)
+        if name is not None:
+            pathlist.append(f'{name}.yaml')
+        man_path = os.path.join(*pathlist)
+        return man_path
+
+    def resource_or_none(self, name, kind, group=None, namespace=None):
+        '''get a resource or none if not found'''
+        man_path = self.build_manifest_path(self.path, name, kind, group, namespace)
+
         if not os.path.exists(man_path):
             return None
         logging.debug(f'loading {group}/{kind} yaml from {man_path}')
@@ -128,10 +74,15 @@ class MustGather:
             resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
             return Resource(resource)
 
-
-class Pod(UserDict, Yamlable, KubeMeta):
-    pass
-
-
-class Resource(UserDict, Yamlable, KubeMeta):
-    pass
+    def resources(self, kind, group=None, namespace=None):
+        yaml_path = self.build_manifest_path(self.path, None, kind, group, namespace)
+        resourcelist = []
+        for f in os.listdir(yaml_path):
+            if not f.endswith('.yaml'):
+                continue
+            resource = self.resource_or_none(f[:-5], kind, group, namespace)
+            if resource is None:
+                logging.error(f'Found yaml {f} did not produce a resource.')
+            else:
+                resourcelist.append(resource)
+        return resourcelist
