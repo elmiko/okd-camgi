@@ -24,14 +24,7 @@ class Yamlable:
 
     
 class ClusterAutoscaler(UserDict, Yamlable, KubeMeta):
-    def old__init__(self, mustgather):
-        self.resource = mustgather.resource_or_none('autoscaling.openshift.io', 'clusterautoscalers', 'default')
-        self.deployment = mustgather.deployment_or_none(mapi_namespace, 'cluster-autoscaler-default')
-        self.pods = []
-        for p in mustgather.podnames(mapi_namespace, 'cluster-autoscaler-default-'):
-            pod = mustgather.pod_or_none(mapi_namespace, p)
-            if pod:
-                self.pods.append(pod)
+    pass
         
 
 class Deployment(UserDict, Yamlable, KubeMeta):
