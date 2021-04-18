@@ -3,6 +3,10 @@ from setuptools import setup
 import okd_camgi
 
 
+with open('README.md', 'r', encoding='utf-8') as readmefile:
+    readme = readmefile.read()
+
+
 dependencies = [
     'jinja2',
     'bottle',
@@ -17,6 +21,10 @@ setup(
     license='GPLv3',
     author='michael mccune',
     author_email='msm@opbstudios.com',
+    description='OKD Cluster Autoscaler Must Gather Investigator',
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    url="https://github.com/elmiko/okd-camgi",
     packages=['okd_camgi'],
     install_requires=dependencies,
     include_package_data=True,
