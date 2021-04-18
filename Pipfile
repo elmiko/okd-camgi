@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+build = "*"
 
 [packages]
 jinja2 = "*"
@@ -17,3 +18,4 @@ python_version = "3.9"
 [scripts]
 okd-camgi = "python -m okd_camgi.main"
 server = "python -m okd_camgi.main --server"
+build = "python -m build"

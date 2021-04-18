@@ -17,7 +17,7 @@ dependencies = [
 
 setup(
     name='okd-camgi',
-    version=camgi.version,
+    version=okd_camgi.version,
     license='GPLv3',
     author='michael mccune',
     author_email='msm@opbstudios.com',
