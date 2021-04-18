@@ -9,6 +9,7 @@ import webbrowser
 from bottle import route, run
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+import okd_camgi
 from okd_camgi.contexts import IndexContext
 from okd_camgi.interfaces import MustGather
 
@@ -31,13 +32,14 @@ def load_index_from_path(path):
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
-    parser = ArgumentParser(description='investigate a must-gather for clues of autoscaler activity')
+    parser = ArgumentParser(prog='okd-camgi', description='investigate a must-gather for clues of autoscaler activity')
     parser.add_argument('path', help='path to the root of must-gather tree')
     parser.add_argument('--webbrowser', action='store_true', help='open a webbrowser to investigation')
     parser.add_argument('--server', action='store_true', help='run in server mode')
     parser.add_argument('--host', help='server host address', default='127.0.0.1')
     parser.add_argument('--port', help='server host port', default='8080')
     parser.add_argument('--output', help='output filename')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {okd_camgi.version}')
     args = parser.parse_args()
 
     content = load_index_from_path(args.path)

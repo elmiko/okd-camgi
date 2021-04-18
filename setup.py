@@ -27,7 +27,9 @@ setup(
     url="https://github.com/elmiko/okd-camgi",
     packages=['okd_camgi'],
     install_requires=dependencies,
-    include_package_data=True,
+    package_data={
+        'okd_camgi': ["templates/*.html"],
+    },
     entry_points={
         'console_scripts': [
             'okd-camgi = okd_camgi.main:main',
