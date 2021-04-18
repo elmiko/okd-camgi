@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 build = "*"
-twine = "*"
 
 [packages]
 jinja2 = "*"
@@ -20,4 +19,3 @@ python_version = "3.9"
 okd-camgi = "python -m okd_camgi.main"
 server = "python -m okd_camgi.main --server"
 build = "python -m build"
-upload-pypi = "python -m twine upload dist/*"
