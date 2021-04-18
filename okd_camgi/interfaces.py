@@ -18,7 +18,13 @@ class Resource(UserDict):
             del data['metadata']['managedFields']
         return yaml.dump(data)
 
-    
+
+class Pod(Resource):
+    def __init__(self, resource, containerlogs):
+        super().__init__(resource)
+        self.containerlogs = containerlogs
+
+
 class MustGather:
     def __init__(self, path):
         self.path = path
@@ -27,6 +33,7 @@ class MustGather:
         self._machines = None
         self._machinesets = None
         self._nodes = None
+        self._pods = {}
 
     @property
     def clusterautoscalers(self):
@@ -60,6 +67,33 @@ class MustGather:
             nodes = self.resources('nodes', 'core')
             self._nodes = sorted(nodes, key=lambda n: n.name())
         return self._nodes
+
+    def pods(self, namespace):
+        if self._pods.get(namespace) is None:
+            pods = []
+            pods_path = self.build_manifest_path(self.path, None, 'pods', None, namespace)
+            # list all pods in the namespace
+            for podname in os.listdir(pods_path):
+                containerlogs = {}
+                # list all files in the pod dir (containers and manifest)
+                for filename in os.listdir(os.path.join(pods_path, podname)):
+                    resource = None
+                    if filename == f'{podname}.yaml':
+                        logging.debug(f'loading {filename}')
+                        with open(os.path.join(pods_path, podname, filename)) as man_file:
+                            resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
+                    # if this is a container, see if there are logs
+                    elif os.path.exists(os.path.join(pods_path, podname, filename, filename, 'logs')):
+                        for logfile in os.listdir(os.path.join(pods_path, podname, filename, filename, 'logs')):
+                            logging.debug(f'found container logs for {filename}, opening {logfile}')
+                            with open(os.path.join(pods_path, podname, filename, filename, 'logs', logfile)) as log:
+                                containerlogs[logfile] = log.read()
+                    else:
+                        continue
+                    if resource is not None:
+                        pods.append(Pod(resource, containerlogs))
+            self._pods[namespace] = pods
+        return self._pods[namespace]
 
     @staticmethod
     def build_manifest_path(path, name, kind, group, namespace):

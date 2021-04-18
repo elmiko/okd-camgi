@@ -1,5 +1,6 @@
 '''Context classes are the adaptors between data interfaces and templates.'''
 from collections import UserDict, UserList
+import logging
 import os.path
 
 from pygments import highlight
@@ -54,6 +55,12 @@ class NodesContext(UserList):
         return notready
 
 
+class PodContext(HighlightedYamlContext):
+    def __init__(self, pod):
+        super().__init__(pod)
+        self.data['containerlogs'] = [{'name': k, 'logs': v} for k, v in pod.containerlogs.items()]
+
+
 class ResourceContext(HighlightedYamlContext):
     pass
 
@@ -71,6 +78,7 @@ class NavListContext(UserDict):
 class IndexContext(UserDict):
     '''Context for the index.html template'''
     def __init__(self, mustgather):
+        mapipods = [PodContext(pod) for pod in mustgather.pods('openshift-machine-api')]
         machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([ResourceContext(machine) for machine in mustgather.machines])
@@ -89,6 +97,7 @@ class IndexContext(UserDict):
             'machines': machines,
             'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
             'machinesets_participating': [ msc for msc in [MachineSetContext(machineset) for machineset in mustgather.machinesets] if msc.autoscaler_min],
+            'mapipods': mapipods,
             'nodes': nodes,
         }
         super().__init__(initial)
