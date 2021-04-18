@@ -10,4 +10,5 @@ to investigate cluster autoscaler behavior and configuration.
 1. Run `okd-camgi --webbrowser $MUST_GATHER_PATH`
 
 Your web browser should now show a page with a summary of the must-gather and some interactive navigation
-buttons. If not, open it to `http://localhost:8080`.
+buttons. If your browser does not open, you will see the URL printed on the terminal, copy it into a new
+browser tab or window.
