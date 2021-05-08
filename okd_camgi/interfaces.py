@@ -125,6 +125,8 @@ class MustGather:
     def resources(self, kind, group=None, namespace=None):
         yaml_path = self.build_manifest_path(self.path, None, kind, group, namespace)
         resourcelist = []
+        if not os.path.exists(yaml_path):
+            return resourcelist
         for f in os.listdir(yaml_path):
             if not f.endswith('.yaml'):
                 continue
