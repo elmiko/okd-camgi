@@ -61,6 +61,18 @@ class MachineSetContext(HighlightedYamlContext):
         return self.data.get('metadata', {}).get('annotations', {}).get('machine.openshift.io/cluster-api-autoscaler-node-group-max-size')
 
 
+class NodeContext(ResourceContext):
+    @property
+    def statusclasses(self):
+        classes = []
+
+        for condition in self.data.get('status', {}).get('conditions', []):
+            if condition.get('type') == 'Ready' and condition.get('status') == 'False':
+                classes.append('bg-danger text-white')
+
+        return ' '.join(classes)
+
+
 class NodesContext(UserList):
     @property
     def notready(self):
@@ -95,7 +107,7 @@ class IndexContext(UserDict):
         machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
-        nodes = NodesContext([ResourceContext(node) for node in mustgather.nodes])
+        nodes = NodesContext([NodeContext(node) for node in mustgather.nodes])
         initial = {
             'accordiondata': [
                 AccordionDataContext('ClusterAutoscalers', clusterautoscalers),
