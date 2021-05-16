@@ -37,8 +37,12 @@ table {
             <a href="#" id="mapipods" class="list-group-item list-group-item-action">Machine API Pods</a>
             <a href="#" id="clusterautoscalers" class="list-group-item list-group-item-action">ClusterAutoscalers</a>
             <a href="#" id="machineautoscalers" class="list-group-item list-group-item-action">MachineAutoscalers</a>
-            <a href="#" id="machines" class="list-group-item list-group-item-action">Machines</a>
-            <a href="#" id="nodes" class="list-group-item list-group-item-action">Nodes</a>
+            <a href="#" id="machines" class="list-group-item list-group-item-action">Machines
+              {% if machines.notrunning|length > 0 %}<span class="badge bg-danger">{{ machines.notrunning|length }}</span>{% endif %}
+            </a>
+            <a href="#" id="nodes" class="list-group-item list-group-item-action">Nodes
+              {% if nodes.notready|length > 0 %}<span class="badge bg-danger">{{ nodes.notready|length }}</span>{% endif %}
+            </a>
           </div>
         </div>
         <div class="col-10">
