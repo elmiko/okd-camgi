@@ -25,6 +25,23 @@ class HighlightedYamlContext(UserDict):
         super().__init__(initial)
 
 
+class ResourceContext(HighlightedYamlContext):
+    @property
+    def statusclasses(self):
+        ''
+
+
+class MachineContext(ResourceContext):
+    @property
+    def statusclasses(self):
+        classes = []
+
+        if self.data.get('status', {}).get('phase') != 'Running':
+            classes.append('bg-danger text-white')
+
+        return ' '.join(classes)
+
+
 class MachinesContext(UserList):
     @property
     def notrunning(self):
@@ -61,10 +78,6 @@ class PodContext(HighlightedYamlContext):
         self.data['containerlogs'] = [{'name': k, 'logs': v} for k, v in pod.containerlogs.items()]
 
 
-class ResourceContext(HighlightedYamlContext):
-    pass
-
-
 class NavListContext(UserDict):
     def __init__(self, cssid, anchor_name, content):
         initial = {
@@ -81,7 +94,7 @@ class IndexContext(UserDict):
         mapipods = [PodContext(pod) for pod in mustgather.pods('openshift-machine-api')]
         machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
-        machines = MachinesContext([ResourceContext(machine) for machine in mustgather.machines])
+        machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([ResourceContext(node) for node in mustgather.nodes])
         initial = {
             'accordiondata': [

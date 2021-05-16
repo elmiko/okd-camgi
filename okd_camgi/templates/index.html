@@ -266,7 +266,7 @@ table {
     <div class="accordion-item">
       <h2 class="accordion-header" id="heading-{{ item.metadata.name|replace(".", "-") }}">
         <button
-            class="accordion-button collapsed p-2"
+            class="accordion-button collapsed p-2 {{ item.statusclasses }}"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#collapse-{{ item.metadata.name|replace(".", "-") }}" 
