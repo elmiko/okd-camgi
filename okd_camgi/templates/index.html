@@ -220,7 +220,7 @@ table {
             data-bs-target="#collapse-{{ pod.metadata.name|replace(".", "-") }}" 
             aria-expanded="false"
             aria-controls="collapse-{{ pod.metadata.name|replace(".", "-") }}">
-          {{ pod.metadata.name }}
+          <strong>{{ pod.metadata.name }}</strong>
         </button>
       </h2>
       <div id="collapse-{{ pod.metadata.name|replace(".", "-") }}"
@@ -238,12 +238,12 @@ table {
       <div class="accordion" id="{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}-accordion">
         <h2 class="accordion-header" id="heading-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}">
           <button
-              class="accordion-button collapsed p-2"
+              class="accordion-button collapsed p-2 ps-4 bg-light"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#collapse-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}"
               aria-controls="collapse-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}">
-            {{ pod.metadata.name }} {{ containerlog.name }}
+            {{ pod.metadata.name }} {{ containerlog.name }} logs
           </button>
         </h2>
         <div id="collapse-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}"
@@ -261,7 +261,7 @@ table {
   </div>
   {% endfor %}
 </data>
-
+ 
 {% for data in accordiondata %}
 <data id="{{ data.cssid }}-data">
   <h1>{{ data.name }}</h1>
