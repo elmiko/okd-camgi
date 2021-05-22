@@ -31,7 +31,6 @@ def load_index_from_path(path):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
     parser = ArgumentParser(prog='okd-camgi', description='investigate a must-gather for clues of autoscaler activity')
     parser.add_argument('path', help='path to the root of must-gather tree')
     parser.add_argument('--webbrowser', action='store_true', help='open a webbrowser to investigation')
@@ -40,7 +39,11 @@ def main():
     parser.add_argument('--port', help='server host port', default='8080')
     parser.add_argument('--output', help='output filename')
     parser.add_argument('--version', action='version', version=f'%(prog)s {okd_camgi.version}')
+    parser.add_argument('--verbose', action='store_true', help='enable verbose logging')
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
 
     content = load_index_from_path(args.path)
     if args.output or not args.server:
