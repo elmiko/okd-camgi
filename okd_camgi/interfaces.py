@@ -78,16 +78,17 @@ class MustGather:
                 # list all files in the pod dir (containers and manifest)
                 for filename in os.listdir(os.path.join(pods_path, podname)):
                     resource = None
+                    currentlog = os.path.join(pods_path, podname, filename, filename, 'logs', 'current.log')
+                    # there should be a manifest for the pod itself
                     if filename == f'{podname}.yaml':
                         logging.debug(f'loading {filename}')
                         with open(os.path.join(pods_path, podname, filename)) as man_file:
                             resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
-                    # if this is a container, see if there are logs
-                    elif os.path.exists(os.path.join(pods_path, podname, filename, filename, 'logs')):
-                        for logfile in os.listdir(os.path.join(pods_path, podname, filename, filename, 'logs')):
-                            logging.debug(f'found container logs for {filename}, opening {logfile}')
-                            with open(os.path.join(pods_path, podname, filename, filename, 'logs', logfile)) as log:
-                                containerlogs[logfile] = log.read()
+                    # sub-directories are containers within the pod, check to see if log files exist
+                    elif os.path.exists(currentlog):
+                        logging.debug(f'found container logs for {filename}, opening {currentlog}')
+                        with open(currentlog) as log:
+                            containerlogs[filename] = log.read()
                     else:
                         continue
                     if resource is not None:
