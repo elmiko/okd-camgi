@@ -83,7 +83,13 @@ class MustGather:
                     if filename == f'{podname}.yaml':
                         logging.debug(f'loading {filename}')
                         with open(os.path.join(pods_path, podname, filename)) as man_file:
-                            resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
+                            try:
+                                resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
+                            except yaml.YAMLError as ex:
+                                # if the yaml is bad, log an error and ignore the manifest
+                                mark = ex.problem_mark
+                                logging.error(f'unable to parse {filename}, error at line:{mark.line+1} col:{mark.column+1}')
+                                resource = None
                     # sub-directories are containers within the pod, check to see if log files exist
                     elif os.path.exists(currentlog):
                         logging.debug(f'found container logs for {filename}, opening {currentlog}')
@@ -120,7 +126,13 @@ class MustGather:
             return None
         logging.debug(f'loading {group}/{kind} yaml from {man_path}')
         with open(man_path) as man_file:
-            resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
+            try:
+                resource = yaml.load(man_file.read(), Loader=yaml.FullLoader)
+            except yaml.YAMLError as ex:
+                # if the yaml is bad, log an error and ignore the manifest
+                mark = ex.problem_mark
+                logging.error(f'unable to parse {man_path}, error at line:{mark.line+1} col:{mark.column+1}')
+                return None
             return Resource(resource)
 
     def resources(self, kind, group=None, namespace=None):
