@@ -57,6 +57,10 @@ table {
   <h1>Summary</h1>
   <hr/>
   <dl>
+    <dt class="text-light bg-secondary ps-1 mb-1">Cluster</dt>
+    <strong>Version:</strong>{{ clusterversion }}</br>
+  </dl>
+  <dl>
     <dt class="text-light bg-secondary ps-1 mb-1">{{ clusterautoscalers|length }} x ClusterAutoscalers</dt>
     <dd>
       {% for clusterautoscaler in clusterautoscalers %}

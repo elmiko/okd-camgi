@@ -8,6 +8,7 @@ with open('README.md', 'r', encoding='utf-8') as readmefile:
 
 
 dependencies = [
+    'dateutil',
     'jinja2',
     'bottle',
     'pyyaml',

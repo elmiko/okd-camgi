@@ -117,6 +117,7 @@ class IndexContext(UserDict):
             ],
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': clusterautoscalers,
+            'clusterversion': mustgather.clusterversion,
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': machineautoscalers,
             'machines': machines,

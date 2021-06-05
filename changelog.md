@@ -2,6 +2,8 @@
 
 ## devel
 
+* add cluster version to summary
+
 ## 0.2.1
 
 * add error logging for failed yaml parses
