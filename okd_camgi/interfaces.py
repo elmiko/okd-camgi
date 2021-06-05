@@ -5,6 +5,7 @@ import json
 import logging
 import os.path
 
+from dateutil.parser import isoparse
 import yaml
 
 
@@ -40,6 +41,21 @@ class MustGather:
         if self._clusterautoscalers is None:
             self._clusterautoscalers = self.resources('clusterautoscalers', 'autoscaling.openshift.io')
         return self._clusterautoscalers
+
+    @property
+    def clusterversion(self):
+        cv = self.resource_or_none('clusterversions', 'config.openshift.io')
+        if cv is not None:
+            try:
+                hist = cv.get('items')[0].get('status').get('history')
+                hist = sorted(hist, key=lambda h: isoparse(h.get('completionTime')), reverse=True)
+                for h in hist:
+                    if h.get('state') == 'Completed':
+                        return h.get('version')
+            except Exception as ex:
+                logging.error(f'error getting clusterversion {str(ex)}')
+                pass
+        return 'Unknown'
 
     @property
     def machineautoscalers(self):

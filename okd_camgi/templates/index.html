@@ -57,6 +57,42 @@ table {
   <h1>Summary</h1>
   <hr/>
   <dl>
+    <dt class="text-light bg-secondary ps-1 mb-1">Cluster</dt>
+    <dd>
+      <table class="table table-sm table-striped font-monospace">
+        <tbody>
+          <tr>
+            <th scope="col">OpenShift version</th>
+            <td>{{ clusterversion }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </dd>
+    <dd>
+      <table class="table table-sm table-striped font-monospace">
+        <thead>
+          <tr>
+            <th scope="col">Resource</th>
+            <th scope="col">Allocatable</th>
+            <th scope="col">Capacity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="col">CPU Cores</th>
+            <td>{{ cluster_resources.cpu.allocatable }}</td>
+            <td>{{ cluster_resources.cpu.capacity }}</td>
+          </tr>
+          <tr>
+            <th scope="col">Memory Bytes</th>
+            <td>{{ cluster_resources.memory.allocatable }}</td>
+            <td>{{ cluster_resources.memory.capacity }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </dd>
+  </dl>
+  <dl>
     <dt class="text-light bg-secondary ps-1 mb-1">{{ clusterautoscalers|length }} x ClusterAutoscalers</dt>
     <dd>
       {% for clusterautoscaler in clusterautoscalers %}
@@ -67,7 +103,7 @@ table {
             <th scope="col">Resource</th>
             <th scope="col">Min</th>
             <th scope="col">Max</th>
-        </tr>
+          </tr>
         </thead>
         <tbody>
           {% if clusterautoscaler.spec.resourceLimits.cores %}

@@ -3,6 +3,7 @@ from collections import UserDict, UserList
 import logging
 import os.path
 
+from kubernetes.utils.quantity import parse_quantity
 from pygments import highlight
 from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
@@ -72,8 +73,53 @@ class NodeContext(ResourceContext):
 
         return ' '.join(classes)
 
+    @property
+    def cpu_allocatable(self):
+        try:
+            return parse_quantity(self.data['status']['allocatable']['cpu'])
+        except Exception as ex:
+            logging.error(f'error parsing node cpu {str(ex)}')
+        return 0
+
+    @property
+    def cpu_capacity(self):
+        try:
+            return parse_quantity(self.data['status']['capacity']['cpu'])
+        except Exception as ex:
+            logging.error(f'error parsing node cpu {str(ex)}')
+        return 0
+
+    @property
+    def memory_allocatable(self):
+        try:
+            return parse_quantity(self.data['status']['allocatable']['memory'])
+        except Exception as ex:
+            logging.error(f'error parsing node memory {str(ex)}')
+        return 0
+
+    @property
+    def memory_capacity(self):
+        try:
+            return parse_quantity(self.data['status']['capacity']['memory'])
+        except Exception as ex:
+            logging.error(f'error parsing node memory {str(ex)}')
+        return 0
+
 
 class NodesContext(UserList):
+    def __init__(self, initial=None):
+        super().__init__(initial)
+
+        self.cpu_allocatable = 0
+        self.cpu_capacity = 0
+        self.memory_allocatable = 0
+        self.memory_capacity = 0
+        for node in self.data:
+            self.cpu_allocatable += node.cpu_allocatable
+            self.cpu_capacity += node.cpu_capacity
+            self.memory_allocatable += node.memory_allocatable
+            self.memory_capacity += node.memory_capacity
+
     @property
     def notready(self):
         notready = []
@@ -108,6 +154,17 @@ class IndexContext(UserDict):
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([NodeContext(node) for node in mustgather.nodes])
+        cluster_resources = {
+            'cpu': {
+                'allocatable': nodes.cpu_allocatable,
+                'capacity': nodes.cpu_capacity,
+            },
+            'memory': {
+                'allocatable': nodes.memory_allocatable,
+                'capacity': nodes.memory_capacity,
+            },
+        }
+
         initial = {
             'accordiondata': [
                 AccordionDataContext('ClusterAutoscalers', clusterautoscalers),
@@ -117,6 +174,8 @@ class IndexContext(UserDict):
             ],
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': clusterautoscalers,
+            'cluster_resources': cluster_resources,
+            'clusterversion': mustgather.clusterversion,
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': machineautoscalers,
             'machines': machines,
