@@ -3,6 +3,7 @@ from collections import UserDict, UserList
 import logging
 import os.path
 
+from kubernetes.utils.quantity import parse_quantity
 from pygments import highlight
 from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
@@ -72,8 +73,33 @@ class NodeContext(ResourceContext):
 
         return ' '.join(classes)
 
+    @property
+    def cpu(self):
+        try:
+            return parse_quantity(self.data['status']['capacity']['cpu'])
+        except Exception as ex:
+            logging.error(f'error parsing node cpu {str(ex)}')
+        return 0
+
+    @property
+    def memory(self):
+        try:
+            return parse_quantity(self.data['status']['capacity']['memory'])
+        except Exception as ex:
+            logging.error(f'error parsing node memory {str(ex)}')
+        return 0
+
 
 class NodesContext(UserList):
+    def __init__(self, initial=None):
+        super().__init__(initial)
+
+        self.cpucapacity = 0
+        self.memorycapacity = 0
+        for node in self.data:
+            self.cpucapacity += node.cpu
+            self.memorycapacity += node.memory
+
     @property
     def notready(self):
         notready = []
@@ -108,6 +134,8 @@ class IndexContext(UserDict):
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([NodeContext(node) for node in mustgather.nodes])
+        clustercpucapacity = nodes.cpucapacity
+        clustermemorycapacity = nodes.memorycapacity
         initial = {
             'accordiondata': [
                 AccordionDataContext('ClusterAutoscalers', clusterautoscalers),
@@ -117,6 +145,8 @@ class IndexContext(UserDict):
             ],
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': clusterautoscalers,
+            'clustercpucapacity': clustercpucapacity,
+            'clustermemorycapacity': clustermemorycapacity,
             'clusterversion': mustgather.clusterversion,
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': machineautoscalers,
