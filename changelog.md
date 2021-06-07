@@ -1,6 +1,6 @@
 # Changelog
 
-## devel
+## 0.3.0
 
 * add cluster alloctable memory and cpu to summary
 * add cluster memory and cpu capacity to summary
