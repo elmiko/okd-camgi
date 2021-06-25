@@ -130,6 +130,49 @@ class NodesContext(UserList):
         return notready
 
 
+class CSRContext(ResourceContext):
+    @property
+    def pending(self):
+        return self.data.get('status', {}) == {}
+
+    @property
+    def denied(self):
+        try:
+            for cond in self.data['status']['conditions']:
+                if cond['type'] == 'Denied':
+                    return True
+        except:
+            pass
+        return False
+
+    @property
+    def failed(self):
+        try:
+            for cond in self.data['status']['conditions']:
+                if cond['type'] == 'Failed':
+                    return True
+        except:
+            pass
+        return False
+
+    @property
+    def statusclasses(self):
+        if self.pending:
+            return 'bg-warning text-white'
+        if self.failed or self.denied:
+            return 'bg-danger text-white'
+
+
+class CSRsContext(UserList):
+    @property
+    def pending(self):
+        return [csr for csr in self.data if csr.pending]
+
+    @property
+    def denied_or_failed(self):
+        return [csr for csr in self.data if csr.denied or csr.failed]
+
+
 class PodContext(HighlightedYamlContext):
     def __init__(self, pod):
         super().__init__(pod)
@@ -154,6 +197,8 @@ class IndexContext(UserDict):
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([NodeContext(node) for node in mustgather.nodes])
+        csrs = CSRsContext(
+                [CSRContext(csr) for csr in mustgather.csrs])
         cluster_resources = {
             'cpu': {
                 'allocatable': nodes.cpu_allocatable,
@@ -171,11 +216,13 @@ class IndexContext(UserDict):
                 AccordionDataContext('MachineAutoscalers', machineautoscalers),
                 AccordionDataContext('Machines', machines),
                 AccordionDataContext('Nodes', nodes),
+                AccordionDataContext('CSRs', csrs),
             ],
             'basename': self.basename(mustgather.path),
             'clusterautoscalers': clusterautoscalers,
             'cluster_resources': cluster_resources,
             'clusterversion': mustgather.clusterversion,
+            'csrs': csrs,
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': machineautoscalers,
             'machines': machines,

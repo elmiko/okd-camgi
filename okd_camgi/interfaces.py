@@ -35,6 +35,13 @@ class MustGather:
         self._machinesets = None
         self._nodes = None
         self._pods = {}
+        self._csrs = None
+
+    @property
+    def csrs(self):
+        if self._csrs is None:
+            self._csrs = self.resources('certificatesigningrequests', 'certificates.k8s.io')
+        return self._csrs
 
     @property
     def clusterautoscalers(self):
