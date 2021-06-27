@@ -1,5 +1,11 @@
 # Changelog
 
+## devel
+
+* add certificate signing requests to displayed resources
+* clean up visual appearance of badges in nav list
+* clean up memory can cpu display on summary
+
 ## 0.3.0
 
 * add cluster alloctable memory and cpu to summary
