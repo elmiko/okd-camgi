@@ -2,6 +2,8 @@
 
 ## devel
 
+## 0.4.0
+
 * add certificate signing requests to displayed resources
 * clean up visual appearance of badges in nav list
 * clean up memory can cpu display on summary
