@@ -91,7 +91,7 @@ table {
             <td>{{ cluster_resources.cpu.capacity }}</td>
           </tr>
           <tr>
-            <th scope="col">Memory Bytes</th>
+            <th scope="col">Memory GB</th>
             <td>{{ cluster_resources.memory.allocatable }}</td>
             <td>{{ cluster_resources.memory.capacity }}</td>
           </tr>
@@ -122,7 +122,7 @@ table {
           {% endif %}
           {% if clusterautoscaler.spec.resourceLimits.memory %}
           <tr>
-            <th scope="col">Memory</th>
+            <th scope="col">Memory GB</th>
             <td>{{ clusterautoscaler.spec.resourceLimits.memory.min }}</td>
             <td>{{ clusterautoscaler.spec.resourceLimits.memory.max }}</td>
           </tr>

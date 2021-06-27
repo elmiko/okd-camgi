@@ -119,6 +119,9 @@ class NodesContext(UserList):
             self.cpu_capacity += node.cpu_capacity
             self.memory_allocatable += node.memory_allocatable
             self.memory_capacity += node.memory_capacity
+        # convert to gigabytes
+        self.memory_allocatable /= pow(10, 9)
+        self.memory_capacity /= pow(10, 9)
 
     @property
     def notready(self):
