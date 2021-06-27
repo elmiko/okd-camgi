@@ -115,7 +115,7 @@ table {
         <tbody>
           {% if clusterautoscaler.spec.resourceLimits.cores %}
           <tr>
-            <th scope="col">Cores</th>
+            <th scope="col">CPU Cores</th>
             <td>{{ clusterautoscaler.spec.resourceLimits.cores.min }}</td>
             <td>{{ clusterautoscaler.spec.resourceLimits.cores.max }}</td>
           </tr>
