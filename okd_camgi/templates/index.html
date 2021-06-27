@@ -43,6 +43,10 @@ table {
             <a href="#" id="nodes" class="list-group-item list-group-item-action">Nodes
               {% if nodes.notready|length > 0 %}<span class="badge bg-danger">{{ nodes.notready|length }}</span>{% endif %}
             </a>
+            <a href="#" id="csrs" class="list-group-item list-group-item-action">CSRs
+              {% if csrs.pending|length > 0 %}<span class="badge bg-warning">{{ csrs.pending|length }}</span>{% endif %}
+              {% if csrs.denied_or_failed|length > 0 %}<span class="badge bg-danger">{{ csrs.denied_or_failed|length }}</span>{% endif %}
+            </a>
           </div>
         </div>
         <div class="col-10">
@@ -349,12 +353,15 @@ var app = new Vue({
 
 var maincontent = document.getElementById('main-content')
 maincontent.style.height = window.innerHeight - 10
+
+/* datalist associates a data element with its button on the side nav */
 var datalist = [
   'mapipods',
   'clusterautoscalers',
   'machineautoscalers',
   'machines',
   'nodes',
+  'csrs',
   'summary',
 ]
 datalist.forEach(function (element) {
