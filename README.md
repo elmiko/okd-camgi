@@ -12,3 +12,13 @@ to investigate cluster autoscaler behavior and configuration.
 Your web browser should now show a page with a summary of the must-gather and some interactive navigation
 buttons. If your browser does not open, you will see the URL printed on the terminal, copy it into a new
 browser tab or window.
+
+## Containerized Server
+
+An alternative to running the command line tool is to start a local containerized webserver which
+hosts the must-gather investigation page. Follow these steps to start a local server:
+
+1. `podman run --rm -it -p 8080:8080 -v /path/to/must-gather:/must-gather:Z quay.io/elmiko/okd-camgi`
+1. Open you web browser to `http://localhost:8080`
+
+As in the Quickstart, your web browser should now show the must-gather investigation page.
