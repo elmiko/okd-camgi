@@ -45,7 +45,8 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
-    content = load_index_from_path(args.path)
+    path = os.path.abspath(args.path)
+    content = load_index_from_path(path)
     if args.output or not args.server:
         indexpath = args.output if args.output else os.path.join(mkdtemp(), 'index.html')
         with open(indexpath, 'w') as indexfile:
@@ -69,7 +70,7 @@ def main():
     if args.server:
         @route('/')
         def handler():
-            content = load_index_from_path(args.path)
+            content = load_index_from_path(path)
             return content
 
         run(host=host, port=port, debug=True)
