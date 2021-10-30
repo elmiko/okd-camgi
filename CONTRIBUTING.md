@@ -8,6 +8,15 @@ namely:
 3. commit your changes to the feature branch
 4. propose feature branch as a pull request
 
+## Branch Structure
+
+The `devel` branch is where all primary work is merged.
+
+Tags are created for releases, and release branches will be created if there
+is ever a need for backfix porting.
+
+Feature branches should be propsed for pull requests.
+
 ## Code structure
 
 The code is organized into 2 primary modules: `contexts` and `interfaces`.
