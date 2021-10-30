@@ -14,6 +14,7 @@ from pygments.formatters import HtmlFormatter
 from okd_camgi import interfaces
 
 
+# Base Classes
 class AccordionDataContext(UserDict):
     def __init__(self, name, iterable):
         initial = {
@@ -40,6 +41,103 @@ class ResourceContext(HighlightedYamlContext):
     @property
     def statusclasses(self):
         ''
+
+
+class NavListContext(UserDict):
+    def __init__(self, cssid, anchor_name, content):
+        initial = {
+            'id': cssid,
+            'anchor_name': anchor_name,
+            'content': content,
+        }
+        super().__init__(initial)
+
+
+# Resource Specific Classes
+class CSRContext(ResourceContext):
+    def __init__(self, initial=None):
+        super().__init__(initial)
+
+        updated = False
+        if self.data['spec'].get('request'):
+            self.data['spec']['request'] = CSRContext.decodeCSR(self.data['spec']['request'])
+            updated = True
+
+        if self.data['status'].get('certificate'):
+            self.data['status']['certificate'] = '<omitted>'
+            updated = True
+
+        if updated:
+            self.highlight()
+
+    @property
+    def pending(self):
+        return self.data.get('status', {}) == {}
+
+    @property
+    def denied(self):
+        try:
+            for cond in self.data['status']['conditions']:
+                if cond['type'] == 'Denied':
+                    return True
+        except:
+            pass
+        return False
+
+    @property
+    def failed(self):
+        try:
+            for cond in self.data['status']['conditions']:
+                if cond['type'] == 'Failed':
+                    return True
+        except:
+            pass
+        return False
+
+    @property
+    def statusclasses(self):
+        if self.pending:
+            return 'bg-warning text-white'
+        if self.failed or self.denied:
+            return 'bg-danger text-white'
+
+    @staticmethod
+    def decodeCSR(data):
+        try:
+            csr = x509.load_pem_x509_csr(base64.b64decode(data))
+            extensions = {}
+            try:
+                if san := csr.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value:
+                    extensions['subjectAlternativeName'] = {
+                        'dnsNames': [],
+                        'ipAddresses': [],
+                    }
+                    for d in san.get_values_for_type(x509.DNSName):
+                        extensions['subjectAlternativeName']['dnsNames'].append(d)
+                    for i in san.get_values_for_type(x509.IPAddress):
+                        extensions['subjectAlternativeName']['ipAddresses'].append(i.exploded)
+            except x509.ExtensionNotFound:
+                if extensions.get('subjectAlternativeName'):
+                    del extensions['subjectAlternativeName']
+
+            request = {
+                'subject': csr.subject.rfc4514_string(),
+                'extensions': extensions,
+            }
+            return request
+        except Exception as ex:
+            print(ex)
+            return data
+
+
+class CSRsContext(UserList):
+    @property
+    def pending(self):
+        return [csr for csr in self.data if csr.pending]
+
+    @property
+    def denied_or_failed(self):
+        return [csr for csr in self.data if csr.denied or csr.failed]
 
 
 class MachineContext(ResourceContext):
@@ -143,108 +241,13 @@ class NodesContext(UserList):
         return notready
 
 
-class CSRContext(ResourceContext):
-    def __init__(self, initial=None):
-        super().__init__(initial)
-
-        updated = False
-        if self.data['spec'].get('request'):
-            self.data['spec']['request'] = CSRContext.decodeCSR(self.data['spec']['request'])
-            updated = True
-
-        if self.data['status'].get('certificate'):
-            self.data['status']['certificate'] = '<omitted>'
-            updated = True
-
-        if updated:
-            self.highlight()
-
-    @property
-    def pending(self):
-        return self.data.get('status', {}) == {}
-
-    @property
-    def denied(self):
-        try:
-            for cond in self.data['status']['conditions']:
-                if cond['type'] == 'Denied':
-                    return True
-        except:
-            pass
-        return False
-
-    @property
-    def failed(self):
-        try:
-            for cond in self.data['status']['conditions']:
-                if cond['type'] == 'Failed':
-                    return True
-        except:
-            pass
-        return False
-
-    @property
-    def statusclasses(self):
-        if self.pending:
-            return 'bg-warning text-white'
-        if self.failed or self.denied:
-            return 'bg-danger text-white'
-
-    @staticmethod
-    def decodeCSR(data):
-        try:
-            csr = x509.load_pem_x509_csr(base64.b64decode(data))
-            extensions = {}
-            try:
-                if san := csr.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value:
-                    extensions['subjectAlternativeName'] = {
-                        'dnsNames': [],
-                        'ipAddresses': [],
-                    }
-                    for d in san.get_values_for_type(x509.DNSName):
-                        extensions['subjectAlternativeName']['dnsNames'].append(d)
-                    for i in san.get_values_for_type(x509.IPAddress):
-                        extensions['subjectAlternativeName']['ipAddresses'].append(i.exploded)
-            except x509.ExtensionNotFound:
-                if extensions.get('subjectAlternativeName'):
-                    del extensions['subjectAlternativeName']
-
-            request = {
-                'subject': csr.subject.rfc4514_string(),
-                'extensions': extensions,
-            }
-            return request
-        except Exception as ex:
-            print(ex)
-            return data
-
-
-class CSRsContext(UserList):
-    @property
-    def pending(self):
-        return [csr for csr in self.data if csr.pending]
-
-    @property
-    def denied_or_failed(self):
-        return [csr for csr in self.data if csr.denied or csr.failed]
-
-
 class PodContext(HighlightedYamlContext):
     def __init__(self, pod):
         super().__init__(pod)
         self.data['containerlogs'] = [{'name': k, 'logs': v} for k, v in pod.containerlogs.items()]
 
 
-class NavListContext(UserDict):
-    def __init__(self, cssid, anchor_name, content):
-        initial = {
-            'id': cssid,
-            'anchor_name': anchor_name,
-            'content': content,
-        }
-        super().__init__(initial)
-
-
+# Main Index
 class IndexContext(UserDict):
     '''Context for the index.html template'''
     def __init__(self, mustgather):
