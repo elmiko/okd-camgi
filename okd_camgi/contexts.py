@@ -213,6 +213,22 @@ class NodeContext(ResourceContext):
             logging.error(f'error parsing node memory {str(ex)}')
         return 0
 
+    @property
+    def nvidiagpu_allocatable(self):
+        try:
+            return parse_quantity(self.data['status']['allocatable']['nvidia.com/gpu'])
+        except Exception as ex:
+            logging.info(f'no nvidia.com/gpu found for {self["metadata"]["name"]}')
+        return 0
+
+    @property
+    def nvidiagpu_capacity(self):
+        try:
+            return parse_quantity(self.data['status']['capacity']['nvidia.com/gpu'])
+        except Exception as ex:
+            logging.info(f'no nvidia.com/gpu found for {self["metadata"]["name"]}')
+        return 0
+
 
 class NodesContext(UserList):
     def __init__(self, initial=None):
@@ -222,11 +238,15 @@ class NodesContext(UserList):
         self.cpu_capacity = 0
         self.memory_allocatable = 0
         self.memory_capacity = 0
+        self.nvidiagpu_allocatable = 0
+        self.nvidiagpu_capacity = 0
         for node in self.data:
             self.cpu_allocatable += node.cpu_allocatable
             self.cpu_capacity += node.cpu_capacity
             self.memory_allocatable += node.memory_allocatable
             self.memory_capacity += node.memory_capacity
+            self.nvidiagpu_allocatable += node.nvidiagpu_allocatable
+            self.nvidiagpu_capacity += node.nvidiagpu_capacity
         # convert to gigabytes
         self.memory_allocatable /= pow(10, 9)
         self.memory_capacity /= pow(10, 9)
@@ -267,6 +287,10 @@ class IndexContext(UserDict):
             'memory': {
                 'allocatable': nodes.memory_allocatable,
                 'capacity': nodes.memory_capacity,
+            },
+            'nvidiagpu': {
+                'allocatable': nodes.nvidiagpu_allocatable,
+                'capacity': nodes.nvidiagpu_capacity,
             },
         }
 
