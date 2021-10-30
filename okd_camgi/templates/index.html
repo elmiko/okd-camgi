@@ -37,7 +37,8 @@ table {
         <div class="col-2" id="nav-col">
           <div class="list-group">
             <a href="#" id="summary" class="list-group-item list-group-item-action">Summary</a>
-            <a href="#" id="mapipods" class="list-group-item list-group-item-action">Machine API Pods</a>
+            <a href="#" id="mapipods" class="list-group-item list-group-item-action">Machine API</a>
+            <a href="#" id="mcopods" class="list-group-item list-group-item-action">Machine Config</a>
             <a href="#" id="clusterautoscalers" class="list-group-item list-group-item-action">ClusterAutoscalers</a>
             <a href="#" id="machineautoscalers" class="list-group-item list-group-item-action">MachineAutoscalers</a>
             <a href="#" id="machines" class="list-group-item list-group-item-action">Machines
@@ -305,6 +306,61 @@ table {
   {% endfor %}
 </data>
  
+<data id="mcopods-data">
+  <h1>Machine Config Pods</h1>
+  {% for pod in mcopods %}
+  <div class="accordion" id="{{ pod.metadata.name|replace(".", "-") }}-accordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="heading-{{ pod.metadata.name|replace(".", "-") }}">
+        <button
+            class="accordion-button collapsed p-2"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-{{ pod.metadata.name|replace(".", "-") }}" 
+            aria-expanded="false"
+            aria-controls="collapse-{{ pod.metadata.name|replace(".", "-") }}">
+          <strong>{{ pod.metadata.name }}</strong>
+        </button>
+      </h2>
+      <div id="collapse-{{ pod.metadata.name|replace(".", "-") }}"
+           class="accordion-collapse collapse"
+           aria-labelledby="heading-{{ pod.metadata.name|replace(".", "-") }}"
+           data-bs-parents="#{{ pod.metadata.name }}-accordion">
+        <div class="accordion-body fs-6">
+          {{ pod.yaml_highlight_content }}
+        </div>
+      </div>
+    </div>
+    {% for containerlog in pod.containerlogs %}
+    {% if containerlog.logs %}
+    <div class="accordion-item">
+      <div class="accordion" id="{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}-accordion">
+        <h2 class="accordion-header" id="heading-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}">
+          <button
+              class="accordion-button collapsed p-2 ps-4 bg-light"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapse-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}"
+              aria-controls="collapse-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}">
+            {{ pod.metadata.name }} {{ containerlog.name }} logs
+          </button>
+        </h2>
+        <div id="collapse-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}"
+             class="accordion-collapse collapse"
+             aria-labelledby="heading-{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}"
+             data-bs-parents="#{{ pod.metadata.name|replace(".", "-") }}-{{ containerlog.name|replace(".", "-") }}-accordion">
+          <div class="accordion-body fs-6">
+            <pre>{{ containerlog.logs }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+</data>
+ 
 {% for data in accordiondata %}
 <data id="{{ data.cssid }}-data">
   <h1>{{ data.name }}</h1>
@@ -360,6 +416,7 @@ maincontent.style.height = window.innerHeight - 10
 /* datalist associates a data element with its button on the side nav */
 var datalist = [
   'mapipods',
+  'mcopods',
   'clusterautoscalers',
   'machineautoscalers',
   'machines',
