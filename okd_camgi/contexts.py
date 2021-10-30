@@ -1,12 +1,17 @@
 '''Context classes are the adaptors between data interfaces and templates.'''
+import base64
 from collections import UserDict, UserList
 import logging
 import os.path
 
+from cryptography import x509
+from cryptography.x509.oid import ExtensionOID
 from kubernetes.utils.quantity import parse_quantity
 from pygments import highlight
 from pygments.lexers import YamlLexer
 from pygments.formatters import HtmlFormatter
+
+from okd_camgi import interfaces
 
 
 class AccordionDataContext(UserDict):
@@ -21,9 +26,14 @@ class AccordionDataContext(UserDict):
 
 class HighlightedYamlContext(UserDict):
     def __init__(self, initial):
-        content = highlight(initial.as_yaml(), YamlLexer(), HtmlFormatter())
-        initial['yaml_highlight_content'] = content
         super().__init__(initial)
+        self.highlight()
+
+    def highlight(self):
+        if self.data.get('yaml_highlight_content'):
+            del self.data['yaml_highlight_content']
+        content = highlight(interfaces.Resource(self.data).as_yaml(), YamlLexer(), HtmlFormatter())
+        self.data['yaml_highlight_content'] = content
 
 
 class ResourceContext(HighlightedYamlContext):
@@ -134,6 +144,21 @@ class NodesContext(UserList):
 
 
 class CSRContext(ResourceContext):
+    def __init__(self, initial=None):
+        super().__init__(initial)
+
+        updated = False
+        if self.data['spec'].get('request'):
+            self.data['spec']['request'] = CSRContext.decodeCSR(self.data['spec']['request'])
+            updated = True
+
+        if self.data['status'].get('certificate'):
+            self.data['status']['certificate'] = '<omitted>'
+            updated = True
+
+        if updated:
+            self.highlight()
+
     @property
     def pending(self):
         return self.data.get('status', {}) == {}
@@ -164,6 +189,34 @@ class CSRContext(ResourceContext):
             return 'bg-warning text-white'
         if self.failed or self.denied:
             return 'bg-danger text-white'
+
+    @staticmethod
+    def decodeCSR(data):
+        try:
+            csr = x509.load_pem_x509_csr(base64.b64decode(data))
+            extensions = {}
+            try:
+                if san := csr.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value:
+                    extensions['subjectAlternativeName'] = {
+                        'dnsNames': [],
+                        'ipAddresses': [],
+                    }
+                    for d in san.get_values_for_type(x509.DNSName):
+                        extensions['subjectAlternativeName']['dnsNames'].append(d)
+                    for i in san.get_values_for_type(x509.IPAddress):
+                        extensions['subjectAlternativeName']['ipAddresses'].append(i.exploded)
+            except x509.ExtensionNotFound:
+                if extensions.get('subjectAlternativeName'):
+                    del extensions['subjectAlternativeName']
+
+            request = {
+                'subject': csr.subject.rfc4514_string(),
+                'extensions': extensions,
+            }
+            return request
+        except Exception as ex:
+            print(ex)
+            return data
 
 
 class CSRsContext(UserList):

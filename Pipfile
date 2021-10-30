@@ -11,6 +11,8 @@ jinja2 = "*"
 bottle = "*"
 pyyaml = "*"
 pygments = "*"
+cryptography = ">=35.0.0"
+okd-camgi = {path = "."}
 
 [requires]
 python_version = "3.9"

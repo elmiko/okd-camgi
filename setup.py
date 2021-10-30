@@ -9,6 +9,7 @@ with open('README.md', 'r', encoding='utf-8') as readmefile:
 
 dependencies = [
     'bottle',
+    'cryptography>=35.0.0',
     'jinja2',
     'kubernetes',
     'python-dateutil',
