@@ -2,6 +2,14 @@
 
 ## devel
 
+* title of index page always show the basename of the directory
+* add a dockerfile and automated build for webserver deployment
+* add decoded csr information to the csr data pages
+* add machine config operator pods
+* add a contributing doc
+* convert index page to use vuejs for improved clarity and performance
+* add nvidia.com/gpu allocatable/capacity to sumamry page
+
 ## 0.4.0
 
 * add certificate signing requests to displayed resources
