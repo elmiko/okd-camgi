@@ -87,6 +87,13 @@ table {
             <td>{{ cluster_resources.memory.allocatable }}</td>
             <td>{{ cluster_resources.memory.capacity }}</td>
           </tr>
+          {% if cluster_resources.nvidiagpu.capacity > 0 %}
+          <tr>
+            <th scope="col">nvidia.com/gpu</th>
+            <td>{{ cluster_resources.nvidiagpu.allocatable }}</td>
+            <td>{{ cluster_resources.nvidiagpu.capacity }}</td>
+          </tr>
+          {% endif %}
         </tbody>
       </table>
     </dd>
