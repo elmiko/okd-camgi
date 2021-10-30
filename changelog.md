@@ -2,6 +2,8 @@
 
 ## devel
 
+## 0.5.0
+
 * title of index page always show the basename of the directory
 * add a dockerfile and automated build for webserver deployment
 * add decoded csr information to the csr data pages
