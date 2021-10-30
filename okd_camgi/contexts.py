@@ -248,7 +248,8 @@ class NavListContext(UserDict):
 class IndexContext(UserDict):
     '''Context for the index.html template'''
     def __init__(self, mustgather):
-        mapipods = [PodContext(pod) for pod in mustgather.pods('openshift-machine-api')]
+        mapipods = sorted([PodContext(pod) for pod in mustgather.pods('openshift-machine-api')], key=lambda p: p['metadata']['name'])
+        mcopods = sorted([PodContext(pod) for pod in mustgather.pods('openshift-machine-config-operator')], key=lambda p: p['metadata']['name'])
         machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
         clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
@@ -285,6 +286,7 @@ class IndexContext(UserDict):
             'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
             'machinesets_participating': [ msc for msc in [MachineSetContext(machineset) for machineset in mustgather.machinesets] if msc.autoscaler_min],
             'mapipods': mapipods,
+            'mcopods': mcopods,
             'nodes': nodes,
         }
         super().__init__(initial)
