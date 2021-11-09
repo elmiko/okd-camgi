@@ -54,6 +54,28 @@ class NavListContext(UserDict):
 
 
 # Resource Specific Classes
+class ClusterAutoscalerContext(ResourceContext):
+    def __init__(self, initial=None):
+        if initial is None or initial.get('spec').get('resourceLimits') is None:
+            # if we got an empty ClusterAutoscaler or are missing the limits, make sure we give the defaults
+            initial.update({
+                'spec': {
+                    'resourceLimits': {
+                        'cores': {
+                            'min': 0,
+                            'max': 320000,
+                        },
+                        'memory': {
+                            'min': 0,
+                            'max': 6400000,
+                        },
+                    }
+                }
+            })
+
+        super().__init__(initial)
+
+
 class CSRContext(ResourceContext):
     def __init__(self, initial=None):
         super().__init__(initial)
@@ -274,7 +296,7 @@ class IndexContext(UserDict):
         mapipods = sorted([PodContext(pod) for pod in mustgather.pods('openshift-machine-api')], key=lambda p: p['metadata']['name'])
         mcopods = sorted([PodContext(pod) for pod in mustgather.pods('openshift-machine-config-operator')], key=lambda p: p['metadata']['name'])
         machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
-        clusterautoscalers = [ResourceContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
+        clusterautoscalers = [ClusterAutoscalerContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([NodeContext(node) for node in mustgather.nodes])
         csrs = CSRsContext(
