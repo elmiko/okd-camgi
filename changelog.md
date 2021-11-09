@@ -2,6 +2,8 @@
 
 ## devel
 
+* add a fix for ClusterAutoscaler with no defined resourceLimits
+
 ## 0.5.0
 
 * title of index page always show the basename of the directory
