@@ -1,7 +1,6 @@
 '''Interfaces into the must gather artifacts and data.'''
 from collections import UserDict
 from copy import deepcopy
-import json
 import logging
 import os.path
 
