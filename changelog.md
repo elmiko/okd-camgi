@@ -2,6 +2,7 @@
 
 ## devel
 
+* add a --tar flag to allow processing of tar files
 * add a fix for ClusterAutoscaler with no defined resourceLimits
 
 ## 0.5.0
