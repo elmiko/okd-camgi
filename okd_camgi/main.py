@@ -1,13 +1,14 @@
 from argparse import ArgumentParser
 import logging
 import os.path
-from tempfile import mkdtemp
+from shutil import unpack_archive
+from tempfile import mkdtemp, TemporaryDirectory
 from threading import Thread
 from time import sleep
 import webbrowser
 
 from bottle import route, run
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 
 import okd_camgi
 from okd_camgi.contexts import IndexContext
@@ -33,6 +34,7 @@ def load_index_from_path(path):
 def main():
     parser = ArgumentParser(prog='okd-camgi', description='investigate a must-gather for clues of autoscaler activity')
     parser.add_argument('path', help='path to the root of must-gather tree')
+    parser.add_argument('--tar', action='store_true', help='open a must-gather archive in tar format')
     parser.add_argument('--webbrowser', action='store_true', help='open a webbrowser to investigation')
     parser.add_argument('--server', action='store_true', help='run in server mode')
     parser.add_argument('--host', help='server host address', default='127.0.0.1')
@@ -46,6 +48,21 @@ def main():
         logging.basicConfig(level=logging.DEBUG)
 
     path = os.path.abspath(args.path)
+
+    if args.tar:
+        extraction_path = TemporaryDirectory(prefix="okd_camgi")
+        logging.info(f"Trying to unpack mg archive {path} into {extraction_path.name}")
+        unpack_archive(path, extract_dir=extraction_path.name)
+        extracted_mg_content_path = next(filter(lambda x: os.path.isdir(x), os.scandir(extraction_path.name)))
+        extracted_mg_content_path = extracted_mg_content_path.path if extracted_mg_content_path else None
+
+        if extracted_mg_content_path:
+            logging.info(f"Found mg root in {extracted_mg_content_path}")
+        else:
+            logging.info(f"No extra dirs was not found in unpacked archive, using {extraction_path}")
+
+        path = extracted_mg_content_path or extraction_path
+
     content = load_index_from_path(path)
     if args.output or not args.server:
         indexpath = args.output if args.output else os.path.join(mkdtemp(), 'index.html')
