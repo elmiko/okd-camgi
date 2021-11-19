@@ -15,6 +15,13 @@ Your web browser should now show a page with a summary of the must-gather and so
 buttons. If your browser does not open, you will see the URL printed on the terminal, copy it into a new
 browser tab or window.
 
+### Direct from tar file
+
+okd-camgi can also process must-gather tar files directly, using the `--tar` flag. for example:
+```bash
+$ okd-camgi path/to/my/must-gather.tar.gz
+```
+
 ## Containerized Server
 
 An alternative to running the command line tool is to start a local containerized webserver which
