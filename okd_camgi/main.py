@@ -1,7 +1,9 @@
 from argparse import ArgumentParser
 import logging
 import os.path
+import pathlib
 from shutil import unpack_archive
+import sys
 from tempfile import mkdtemp, TemporaryDirectory
 from threading import Thread
 from time import sleep
@@ -13,6 +15,26 @@ from jinja2 import Environment, PackageLoader
 import okd_camgi
 from okd_camgi.contexts import IndexContext
 from okd_camgi.interfaces import MustGather
+
+
+def find_must_gather_root(path):
+    # attempt to determine if the path given is a valid must-gather
+    # we do this by looking for a few files which should be present.
+    # the rules are as follows:
+    # 1. look for a `version` file in the current path, if it exists return path
+    # 2. look for the directories `namespaces` and `cluster-scoped-resources` in the current path, if they exist return path
+    # 3. look to see if there is a single subdirectory in the path, if so run this function on that path and return the result
+    # 4. return None
+    if os.path.exists(os.path.join(path, 'version')):
+        return path
+    if os.path.isdir(os.path.join(path, 'namespaces')) and os.path.isdir(os.path.join(path, 'cluster-scoped-resources')):
+        return path
+
+    pathfiles = [d for d in pathlib.Path(path).iterdir() if d.is_dir()]
+    if len(pathfiles) == 1:
+        return find_must_gather_root(str(pathfiles[0]))
+
+    return None
 
 
 def load_index_from_path(path):
@@ -63,7 +85,13 @@ def main():
 
         path = extracted_mg_content_path or extraction_path
 
-    content = load_index_from_path(path)
+    path = find_must_gather_root(path)
+    if path is not None:
+        content = load_index_from_path(path)
+    else:
+        logging.error(f'"{os.path.abspath(args.path)}" does not appear to be a valid must-gather archive')
+        sys.exit(1)
+
     if args.output or not args.server:
         indexpath = args.output if args.output else os.path.join(mkdtemp(), 'index.html')
         with open(indexpath, 'w') as indexfile:

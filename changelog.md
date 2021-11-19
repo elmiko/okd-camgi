@@ -2,6 +2,7 @@
 
 ## devel
 
+* improve directory detection and error reporting for must-gathers
 * add a --tar flag to allow processing of tar files
 * add a fix for ClusterAutoscaler with no defined resourceLimits
 
