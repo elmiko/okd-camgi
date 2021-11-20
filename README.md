@@ -19,7 +19,7 @@ browser tab or window.
 
 okd-camgi can also process must-gather tar files directly, using the `--tar` flag. for example:
 ```bash
-$ okd-camgi path/to/my/must-gather.tar.gz
+$ okd-camgi --tar path/to/my/must-gather.tar.gz
 ```
 
 ## Containerized Server
