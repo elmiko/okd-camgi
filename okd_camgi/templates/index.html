@@ -172,14 +172,16 @@ table {
         <thead>
           <tr>
             <th scope="col">Name</th>
-            <th scope="col">Min Replicas</th>
-            <th scope="col">Max Replicas</th>
+            <th scope="col">Current Replicas</th>
+            <th scope="col">Min</th>
+            <th scope="col">Max</th>
           </tr>
         </thead>
         <tbody>
           {% for machineset in machinesets_participating %}
           <tr>
             <th scope="col">{{ machineset.metadata.name }}</th>
+            <td>{{ machineset.spec.replicas }}</td>
             <td>{{ machineset.autoscaler_min }}</td>
             <td>{{ machineset.autoscaler_max }}</td>
           </tr>
