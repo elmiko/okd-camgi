@@ -32,6 +32,7 @@ table {
             <a href="#" v-on:click="changeContent('mcopods')" class="list-group-item list-group-item-action">Machine Config</a>
             <a href="#" v-on:click="changeContent('clusterautoscalers')" class="list-group-item list-group-item-action">ClusterAutoscalers</a>
             <a href="#" v-on:click="changeContent('machineautoscalers')" class="list-group-item list-group-item-action">MachineAutoscalers</a>
+            <a href="#" v-on:click="changeContent('machinesets')" class="list-group-item list-group-item-action">MachineSets</a>
             <a href="#" v-on:click="changeContent('machines')" class="list-group-item list-group-item-action">Machines
               {% if machines.notrunning|length > 0 %}<span class="badge bg-danger float-right">{{ machines.notrunning|length }}</span>{% endif %}
             </a>
