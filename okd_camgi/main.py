@@ -75,18 +75,11 @@ def main():
         extraction_path = TemporaryDirectory(prefix="okd_camgi")
         logging.info(f"Trying to unpack mg archive {path} into {extraction_path.name}")
         unpack_archive(path, extract_dir=extraction_path.name)
-        extracted_mg_content_path = next(filter(lambda x: os.path.isdir(x), os.scandir(extraction_path.name)))
-        extracted_mg_content_path = extracted_mg_content_path.path if extracted_mg_content_path else None
-
-        if extracted_mg_content_path:
-            logging.info(f"Found mg root in {extracted_mg_content_path}")
-        else:
-            logging.info(f"No extra dirs was not found in unpacked archive, using {extraction_path}")
-
-        path = extracted_mg_content_path or extraction_path
+        path = find_must_gather_root(extraction_path.name)
 
     path = find_must_gather_root(path)
     if path is not None:
+        logging.info(f'Found valid must-gather in {os.path.abspath(args.path)}')
         content = load_index_from_path(path)
     else:
         logging.error(f'"{os.path.abspath(args.path)}" does not appear to be a valid must-gather archive')
