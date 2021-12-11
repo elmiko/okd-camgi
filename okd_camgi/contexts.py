@@ -297,6 +297,7 @@ class IndexContext(UserDict):
         mcopods = sorted([PodContext(pod) for pod in mustgather.pods('openshift-machine-config-operator')], key=lambda p: p['metadata']['name'])
         machineautoscalers = [ResourceContext(machineautoscaler) for machineautoscaler in mustgather.machineautoscalers]
         clusterautoscalers = [ClusterAutoscalerContext(clusterautoscaler) for clusterautoscaler in mustgather.clusterautoscalers]
+        machinesets = [MachineSetContext(machineset) for machineset in mustgather.machinesets]
         machines = MachinesContext([MachineContext(machine) for machine in mustgather.machines])
         nodes = NodesContext([NodeContext(node) for node in mustgather.nodes])
         csrs = CSRsContext(
@@ -320,6 +321,7 @@ class IndexContext(UserDict):
             'accordiondata': [
                 AccordionDataContext('ClusterAutoscalers', clusterautoscalers),
                 AccordionDataContext('MachineAutoscalers', machineautoscalers),
+                AccordionDataContext('MachineSets', machinesets),
                 AccordionDataContext('Machines', machines),
                 AccordionDataContext('Nodes', nodes),
                 AccordionDataContext('CSRs', csrs),
@@ -332,8 +334,8 @@ class IndexContext(UserDict):
             'highlight_css': HtmlFormatter().get_style_defs('.highlight'),
             'machineautoscalers': machineautoscalers,
             'machines': machines,
-            'machinesets': [MachineSetContext(machineset) for machineset in mustgather.machinesets],
-            'machinesets_participating': [ msc for msc in [MachineSetContext(machineset) for machineset in mustgather.machinesets] if msc.autoscaler_min],
+            'machinesets': machinesets,
+            'machinesets_participating': [ msc for msc in machinesets if msc.autoscaler_min],
             'mapipods': mapipods,
             'mcopods': mcopods,
             'nodes': nodes,
