@@ -2,6 +2,9 @@
 
 ## devel
 
+* add machinesets to navigation tabs
+* add current replicas to participating machinesets on summary
+
 ## 0.6.0
 
 * improve directory detection and error reporting for must-gathers
