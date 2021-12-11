@@ -13,6 +13,7 @@ pyyaml = "*"
 pygments = "*"
 cryptography = ">=35.0.0"
 okd-camgi = {path = "."}
+requests = "*"
 
 [requires]
 python_version = "3.9"

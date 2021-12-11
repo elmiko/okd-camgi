@@ -24,10 +24,11 @@ $ okd-camgi --tar path/to/my/must-gather.tar.gz
 
 ## Containerized Server
 
-An alternative to running the command line tool is to start a local containerized webserver which
-hosts the must-gather investigation page. Follow these steps to start a local server:
+Camgi also includes a server mode which allows for dynamic creation of investigation
+pages. Start the server and then make queries with the `url` query parameter
+specifying a url to a must-gather archive file. The server will download the file,
+extract the archive, process the files, and return a generated webpage.
 
-1. `podman run --rm -it -p 8080:8080 -v /path/to/must-gather:/must-gather:Z quay.io/elmiko/okd-camgi`
-1. Open you web browser to `http://localhost:8080`
+1. `podman run --rm -it -p 8080:8080 quay.io/elmiko/okd-camgi`
+1. Open you web browser to `http://localhost:8080?url=http://path/to/must-gather.tar.gz`
 
-As in the Quickstart, your web browser should now show the must-gather investigation page.

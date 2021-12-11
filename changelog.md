@@ -2,6 +2,7 @@
 
 ## devel
 
+* refactor server for dynamic interaction
 * add machinesets to navigation tabs
 * add current replicas to participating machinesets on summary
 
